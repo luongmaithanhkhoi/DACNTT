@@ -1,0 +1,2 @@
+cd C:\Users\thanh\Desktop\DACNTT\internship-platform
+npx tsx lib/supabase/scripts/seed.ts
