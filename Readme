@@ -1,2 +1,46 @@
 cd C:\Users\thanh\Desktop\DACNTT\internship-platform
 npx tsx lib/supabase/scripts/seed.ts
+
+npm i
+npm run dev
+
+Test:
+(Sinh viên)
+"email": "52100022@student.tdtu.edu.vn",
+"password": "abc123"
+
+
+API:
+Authentication & User Management:
+- POST /api/admin/users: Tạo tài khoản mới (admin)
+- POST /api/auth/login: Đăng nhập
+- GET /api/auth/session: Kiểm tra token (Đăng nhập)
+
+Student Management:
+- GET /api/students/me: Lấy thông tin sinh viên hiện tại
+- PATCH /api/students/me: Cập nhật thông tin sinh viên
+- POST /api/auth/forgot-password: Quên mật khẩu
+- PUT /api/students/me/skills: Cập nhật kỹ năng sinh viên
+- DELETE /api/students/me/skills/<skillId>: Xóa kỹ năng sinh viên
+- GET /api/students/me/preferences: Lấy sở thích sinh viên
+- PUT /api/students/me/preferences: Cập nhật sở thích sinh viên
+- POST /api/students/me/avatar: Tải lên ảnh đại diện sinh viên
+- POST /api/students/me/cv: Tải lên CV sinh viên
+- POST /api/auth/logout: Đăng xuất
+- POST /api/students/me/cv:parse (chưa hoàn thành): Gọi job AI parse CV (trả ra extracted.skills, education, languages, …); có thể lưu vào Student.cv_parsed.
+
+Job Management:
+- GET /api/jobs: tìm/ lọc/ phân trang job
+- GET /api/jobs/[jobId]: xem chi tiết 1 job
+- GET /api/jobs/[jobId]/similar: xem các job tương tự (theo job hiện tại)
+- GET /api/jobs/similar?skill=skill1,skill2,...: xem các job tương tự (theo kỹ năng)
+- POST /api/jobs/[jobId]/bookmark: Đánh dấu yêu thích job
+- DELETE /api/jobs/[jobId]/bookmark: Bỏ đánh dấu yêu thích job
+- GET /api/students/me/bookmarks: Lấy danh sách job đã đánh dấu yêu thích
+-
+-
+-
+-
+-
+-
+-
