@@ -37,10 +37,21 @@ Job Management:
 - POST /api/jobs/[jobId]/bookmark: Đánh dấu yêu thích job
 - DELETE /api/jobs/[jobId]/bookmark: Bỏ đánh dấu yêu thích job
 - GET /api/students/me/bookmarks: Lấy danh sách job đã đánh dấu yêu thích
--
--
--
--
--
--
--
+
+Application Management:
+- POST /api/applications: Nộp đơn ứng tuyển job
+- GET /api/students/me/applications: Lấy danh sách đơn ứng tuyển của sinh viên
+- GET /api/students/me/applications/[Id]: Xem chi tiết đơn ứng tuyển
+- PATCH /api/students/me/applications/[Id]: Cập nhật đơn ứng tuyển (trạng thái, phản hồi, ...)
+
+Event:
+- GET /api/events: liệt kê/bộ lọc/phân trang sự kiện
+- GET /api/events/[id]: chi tiết 1 sự kiện
+- POST /api/events/[id]/register: SV đăng ký tham gia sự kiện
+- GET /api/students/me/events: danh sách sự kiện SV đã đăng ký
+
+Notification:
+- GET /api/notifications: liệt kê thông báo (lọc, phân trang)
+- GET /api/notifications/unread-count: đếm số thông báo chưa đọc
+- POST /api/notifications/mark-all-read: đánh dấu đã đọc tất cả
+- POST /api/notifications/[id]/read: đánh dấu đã đọc 1 thông báo
