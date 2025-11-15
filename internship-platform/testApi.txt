@@ -15,11 +15,11 @@ body:
   "image_url": "https://via.placeholder.com/200"
 }
 
-GET - Lấy chi tiết 1 enterprise
+GET - Lấy chi tiết 1 enterprise (Profile)
 url: http://localhost:3000/api/enterprises/[id]
 
 
-PUT - Cập nhật enterprise
+PUT - Cập nhật enterprise 
 url: http://localhost:3000/api/enterprises/[id]
 
 body:
