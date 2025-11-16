@@ -55,8 +55,8 @@ body:
 }
 
 
-GET - Lấy job theo cty
-url: http://localhost:3000/api/enterprises/[id]/jobs
+GET - Lấy job theo cty (enterprise_id)
+url: http://localhost:3000/api/enterprises/[id]/jobs 
 
 url: http://localhost:3000/api/enterprises/[id]/jobs?is_open=true
 
@@ -90,3 +90,42 @@ body:
 {
   "job_id": "6d0d4326-94c5-4fd3-801b-1493f6d9f640"
 }
+
+Update profile enterprise 
+url: http://localhost:3000/api/enterprises/abb1f9c4-9887-4e5c-80ef-225899fc4361/profile
+body:
+{
+  "name": "FPT Software JSC",
+  "description": "Công ty phần mềm hàng đầu Việt Nam tuyen sinh",
+  "contact_email": "new@fpt.com",
+  "website": "https://newfpt.com",
+  "location": "29 Duy Tân, Hà Nội",
+  "industry": "IT Services"
+}
+GET Danh sách ứng viên ứng tuyển cho 1 jobs
+URL: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications
+
+GET Thống kê ứng viên theo trạng thái
+url: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications/stats
+
+GET Lấy danh sách ứng viên của 1 tin tuyển dụng (error) 
+URL: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications?status=PENDING
+
+GET AI xếp hạng ứng viên
+
+URL: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications/ranked
+
+PATCH Cập nhật trạng thái hồ sơ
+URL: http://localhost:3000/api/applications/4dfa1497-7beb-493e-a359-ae0353f133a3/status
+Body:
+{
+  "status": "PENDING",
+  "note": "Ứng viên đạt yêu cầu, mời phỏng vấn"
+}
+
+GET Tìm kiếm studen
+URL: http://localhost:3000/api/students/search?major=Software Engineering
+
+GET: Chi tiết sinh viên
+URL: http://localhost:3000/api/students/2a36089e-2700-4c08-bb2d-644651367d32
+
