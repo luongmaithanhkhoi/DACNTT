@@ -161,7 +161,7 @@ async function seedDatabase() {
       .select()
     
     if (enterprisesError) throw enterprisesError
-    console.log(`✅ Đã tạo ${enterprisesData?.length} enterprises\n`)
+    console.log(`Đã tạo ${enterprisesData?.length} enterprises\n`)
 
     // 4. Tạo Users (Students)
     console.log('Tạo Users...')
@@ -207,7 +207,7 @@ async function seedDatabase() {
     console.log(`Đã tạo ${usersData?.length} users\n`)
 
     // 5. Tạo Students
-    console.log('🎓 Tạo Students...')
+    console.log('Tạo Students...')
     const students = [
       {
         user_id: usersData[0].id,
@@ -238,7 +238,7 @@ async function seedDatabase() {
       .select()
     
     if (studentsError) throw studentsError
-    console.log(`✅ Đã tạo ${studentsData?.length} students\n`)
+    console.log(`Đã tạo ${studentsData?.length} students\n`)
 
     // 6. Tạo Enterprise Users
     console.log('💼 Tạo Enterprise Users...')
@@ -257,7 +257,7 @@ async function seedDatabase() {
       .select()
     
     if (enterpriseUsersError) throw enterpriseUsersError
-    console.log(`✅ Đã tạo ${enterpriseUsersData?.length} enterprise users\n`)
+    console.log(`Đã tạo ${enterpriseUsersData?.length} enterprise users\n`)
 
     // 7. Tạo Job Postings
     console.log('💼 Tạo Job Postings...')

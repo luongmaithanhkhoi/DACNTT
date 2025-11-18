@@ -1,0 +1,131 @@
+GET - Lấy danh sách enterprises
+url: http://localhost:3000/api/enterprises
+
+GET - Lấy danh sách enterprises với paramater
+url: http://localhost:3000/api/enterprises?page=1&limit=10&search=FPT
+
+POST - Tạo enterprise 
+url: http://localhost:3000/api/enterprises
+
+body:
+{
+  "name": "Test Company",
+  "description": "Test description",
+  "industry": "Technology",
+  "image_url": "https://via.placeholder.com/200"
+}
+
+GET - Lấy chi tiết 1 enterprise (Profile)
+url: http://localhost:3000/api/enterprises/[id]
+
+
+PUT - Cập nhật enterprise 
+url: http://localhost:3000/api/enterprises/[id]
+
+body:
+{
+  "name": "Updated Name",
+  "description": "Updated description"
+}
+
+DELETE - Xóa enterprise
+url: http://localhost:3000/api/enterprises/[id]
+
+POST- Tạo job có skill:
+url: http://localhost:3000/api/enterprises/[id]/jobs
+body:
+{
+  "title": "Frontend Developer Intern",
+  "description": "Tìm kiếm intern có kinh nghiệm React",
+  "location": "Hà Nội",
+  "internship_period": "3 tháng",
+  "require_gpa_min": 3.0,
+  "application_deadline": "2025-12-31",
+  "skills": [
+        {
+        "skill_id": "ad63722a-4122-4207-bbcd-dbca9d66deb3",
+        "required_level": 4
+        },
+        {
+        "skill_id": "1844f783-675c-4a4c-b16f-a1c34bbc216f",
+        "required_level": 3
+        }
+    ]
+  
+}
+
+
+GET - Lấy job theo cty (enterprise_id)
+url: http://localhost:3000/api/enterprises/[id]/jobs 
+
+url: http://localhost:3000/api/enterprises/[id]/jobs?is_open=true
+
+lấy job theo yêu cầu:
+
+url: http://localhost:3000/api/enterprises/[id]/jobs?is_open=true&keyword=js
+
+
+UPDATE - Cập nhật job, có skills
+url: http://localhost:3000/api/enterprises/[id]/jobs
+body:
+{
+  "job_id": "bc955a26-a663-4a93-91ed-8d2d312d108f",
+  "title": "Frontend Developer Intern",
+  "description": "Thực tập phát triển giao diện Python",
+  "location": "TP.HCM",
+  "internship_period": "6 tháng",
+  "require_gpa_min": 2.5,
+  "application_deadline": "2025-12-01",
+  "is_open": true,
+  "skills": [
+    { "skill_id": "263cd0c1-b790-4490-9ade-d000a6a00c73", "required_level": 2 },
+    { "skill_id": "284ef345-28bd-4880-94f9-524ca2dea4cb", "required_level": 3 }
+  ]
+}
+
+DELETE - Xóa job
+url: http://localhost:3000/api/enterprises/[id]/jobs
+
+body:
+{
+  "job_id": "6d0d4326-94c5-4fd3-801b-1493f6d9f640"
+}
+
+Update profile enterprise 
+url: http://localhost:3000/api/enterprises/abb1f9c4-9887-4e5c-80ef-225899fc4361/profile
+body:
+{
+  "name": "FPT Software JSC",
+  "description": "Công ty phần mềm hàng đầu Việt Nam tuyen sinh",
+  "contact_email": "new@fpt.com",
+  "website": "https://newfpt.com",
+  "location": "29 Duy Tân, Hà Nội",
+  "industry": "IT Services"
+}
+GET Danh sách ứng viên ứng tuyển cho 1 jobs
+URL: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications
+
+GET Thống kê ứng viên theo trạng thái
+url: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications/stats
+
+GET Lấy danh sách ứng viên của 1 tin tuyển dụng (error) 
+URL: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications?status=PENDING
+
+GET AI xếp hạng ứng viên
+
+URL: http://localhost:3000/api/jobs/7d45dbbc-a4e0-4e97-b54e-77a984efe3f8/applications/ranked
+
+PATCH Cập nhật trạng thái hồ sơ
+URL: http://localhost:3000/api/applications/4dfa1497-7beb-493e-a359-ae0353f133a3/status
+Body:
+{
+  "status": "PENDING",
+  "note": "Ứng viên đạt yêu cầu, mời phỏng vấn"
+}
+
+GET Tìm kiếm studen
+URL: http://localhost:3000/api/students/search?major=Software Engineering
+
+GET: Chi tiết sinh viên
+URL: http://localhost:3000/api/students/2a36089e-2700-4c08-bb2d-644651367d32
+
