@@ -1,7 +1,12 @@
+"use client";
+
 import Head from "next/head";
 import Script from "next/script";
+import LocationAutocomplete from "./components/LocationAutocomplete";
+import { useState } from "react";
 
 export default function Home() {
+  const [locationId, setLocationId] = useState("");
   return (
     <>
       <Head>
@@ -340,10 +345,7 @@ export default function Home() {
                   </div>
                   <div className="col-lg-3">
                     <div className="input-group">
-                      <select name="location" className="dropdown">
-                        <option>Location... </option>
-                        <option value="new-york">New York</option>
-                      </select>
+                      <LocationAutocomplete onSelect={setLocationId} />
                     </div>
                   </div>
                   <div className="col-lg-3">
@@ -1290,12 +1292,18 @@ export default function Home() {
         </div>
       </div>
       {/*copyright end*/}
-<Script src="js/jquery-2.1.4.min.js"></Script> 
-<Script src="js/bootstrap.bundle.min.js"></Script>  
-<Script type="text/javaScript" src="rs-plugin/js/jquery.themepunch.tools.min.js"></Script> 
-<Script type="text/javaScript" src="rs-plugin/js/jquery.themepunch.revolution.min.js"></Script> 
-<Script src="js/owl.carousel.js"></Script> 
-<Script type="text/javaScript" src="js/Script.js"></Script>
+      <Script src="js/jquery-2.1.4.min.js"></Script>
+      <Script src="js/bootstrap.bundle.min.js"></Script>
+      <Script
+        type="text/javaScript"
+        src="rs-plugin/js/jquery.themepunch.tools.min.js"
+      ></Script>
+      <Script
+        type="text/javaScript"
+        src="rs-plugin/js/jquery.themepunch.revolution.min.js"
+      ></Script>
+      <Script src="js/owl.carousel.js"></Script>
+      <Script type="text/javaScript" src="js/Script.js"></Script>
     </>
   );
 }
