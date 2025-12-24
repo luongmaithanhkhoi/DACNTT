@@ -2,11 +2,15 @@
 
 import Head from "next/head";
 import Script from "next/script";
-import LocationAutocomplete from "./components/LocationAutocomplete";
+import LocationAutocomplete from "./components/home/LocationAutocomplete";
+import CategorySelect from "./components/home/CategorySelect";
+import JobCategoryGrid from "./components/home/JobCategoryGrid";
+
 import { useState } from "react";
 
 export default function Home() {
   const [locationId, setLocationId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   return (
     <>
       <Head>
@@ -41,20 +45,20 @@ export default function Home() {
             <div className="col-lg-3 col-md-3 navbar-light">
               <div className="logo">
                 <a href="index.html">
-                  <img src="images/logo.png" alt="" />
+                  <img src="images/TDTU.png" alt="" />
                 </a>
               </div>
               <button
-                className="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarScroll"
-                aria-controls="navbarScroll"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-              >
-                <span className="navbar-toggler-icon" />
-              </button>
+  type="button"
+  className="navbar-toggle"
+  data-toggle="collapse"
+  data-target="#navbarScroll"
+>
+  <span className="icon-bar"></span>
+  <span className="icon-bar"></span>
+  <span className="icon-bar"></span>
+</button>
+
             </div>
             {/*col-lg-3 end*/}
             {/*col-lg-7 end*/}
@@ -350,12 +354,7 @@ export default function Home() {
                   </div>
                   <div className="col-lg-3">
                     <div className="input-group">
-                      <select name="category" className="form-control">
-                        <option>Category... </option>
-                        <option value={1}>Web Designer</option>
-                        <option value={2}>Web Developer</option>
-                        <option value={3}>SEO Expert</option>
-                      </select>
+                    <CategorySelect onSelect={setCategoryId} />
                     </div>
                   </div>
                   <div className="col-lg-2">
@@ -380,7 +379,7 @@ export default function Home() {
           <div className="heading-title">
             Browse <span>Jobs</span>
           </div>
-          <ul className="row">
+          {/* <ul className="row">
             <li className="col-lg-3 col-md-6 ">
               <div className="jobsWrp">
                 <div className="job-icon">
@@ -461,7 +460,11 @@ export default function Home() {
                 </div>
               </div>
             </li>
-          </ul>
+          </ul> */}
+          <div className="browse-jobs">
+  <JobCategoryGrid />
+</div>
+
           <div className="read-btn">
             <a href="#">View All Categories</a>
           </div>

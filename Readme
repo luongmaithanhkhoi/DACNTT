@@ -1,2 +1,7 @@
 cd C:\Users\thanh\Desktop\DACNTT\internship-platform
 npx tsx lib/supabase/scripts/seed.ts
+
+
+db đã sửa:
+- Thêm Location, JobCategory
+- npm uninstall bootstrap (load navbar)

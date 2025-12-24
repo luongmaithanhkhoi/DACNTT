@@ -18,6 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+      <link
+          rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+        />
         {/* Google Fonts */}
         <link
           href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic"
@@ -67,6 +71,17 @@ export default function RootLayout({
         {/* 5️⃣ Script chính của template */}
         <Script
           src="/js/script.js"
+          strategy="afterInteractive"
+        />
+        {/* jQuery - BẮT BUỘC cho Bootstrap 3 */}
+        <Script
+          src="https://code.jquery.com/jquery-3.6.0.min.js"
+          strategy="beforeInteractive"
+        />
+
+        {/* Bootstrap 3 JS */}
+        <Script
+          src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
           strategy="afterInteractive"
         />
       </body>

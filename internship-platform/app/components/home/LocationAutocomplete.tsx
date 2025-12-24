@@ -17,7 +17,6 @@ export default function LocationAutocomplete({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
-  // Load locations (OK vì đây là external system: API)
   useEffect(() => {
     fetch("/api/locations")
       .then(res => res.json())
@@ -25,9 +24,11 @@ export default function LocationAutocomplete({
       .catch(console.error);
   }, []);
 
-  // Derived state → useMemo (KHÔNG useEffect)
   const filtered = useMemo(() => {
-    if (!query.trim()) return [];
+    // Click vào chưa gõ → show list
+    if (!query.trim()) {
+      return locations;
+    }
 
     const q = query.toLowerCase();
     return locations.filter(loc =>
@@ -46,6 +47,7 @@ export default function LocationAutocomplete({
       <input
         type="text"
         className="form-control"
+        style={{ position: "relative", zIndex: 3000 }}
         placeholder="Location..."
         value={query}
         onChange={(e) => {
@@ -53,6 +55,7 @@ export default function LocationAutocomplete({
           setOpen(true);
         }}
         onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
       />
 
       {open && filtered.length > 0 && (
@@ -65,7 +68,7 @@ export default function LocationAutocomplete({
             background: "#fff",
             border: "1px solid #ddd",
             zIndex: 1000,
-            maxHeight: 200,
+            maxHeight: 220,
             overflowY: "auto",
             listStyle: "none",
             margin: 0,
@@ -75,7 +78,10 @@ export default function LocationAutocomplete({
           {filtered.map(loc => (
             <li
               key={loc.id}
-              style={{ padding: "8px 12px", cursor: "pointer" }}
+              style={{
+                padding: "8px 12px",
+                cursor: "pointer",
+              }}
               onMouseDown={() => handleSelect(loc)}
             >
               {loc.name}
