@@ -1,52 +1,233 @@
+import Link from "next/link";
+import Head from "next/head";
 export default function Header() {
   return (
+    <>
+    <Head>
+        <meta charSet="utf-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags */}
+        <title>Job Finder</title>
+        {/* Fav Icon */}
+        <link rel="shortcut icon" href="favicon.ico" />
+        {/* Bootstrap */}
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="/css/owl.carousel.css" rel="stylesheet" />
+        <link href="/css/font-awesome.css" rel="stylesheet" />
+        <link href="/css/style.css" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic"
+          rel="stylesheet"
+          type="text/css"
+        />
+        <link
+          href="https://fonts.googleapis.com/css?family=Alice"
+          rel="stylesheet"
+        />
+      </Head>
     <div className="header-wrap">
-      <div className="container">
-        <div className="row">
-          {/* Logo */}
-          <div className="col-lg-3 col-md-3 navbar-light">
-            <div className="logo">
-              <a href="/">
-                <img src="/images/logo.png" alt="Logo" />
-              </a>
-            </div>
-          </div>
+        <div className="container">
+          {/*row start*/}
+          <div className="row">
+            {/*col-lg-3 start*/}
+            <div className="col-lg-3 col-md-3 navbar-light">
+              <div className="logo-wrap">
+                <div className="logo">
+                  <Link href="/">
+                    <img src="images/TDTU.png" alt="TDTU" />
+                  </Link>
+                </div>
 
-          {/* Navigation */}
-          <div className="col-lg-5 col-md-9">
-            <div className="navigationwrape">
-              <div className="navbar navbar-expand-lg navbar-default navbar-light">
-                <div className="navbar-collapse collapse">
-                  <ul className="nav navbar-nav">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/about-us">About Us</a></li>
-                    <li><a href="/job-listing">Jobs</a></li>
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="/contact-us">Contact</a></li>
-                  </ul>
+                <div className="logo-text">
+                  <Link href="/">KHOA CÔNG NGHỆ THÔNG TIN</Link>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Right buttons */}
-          <div className="col-lg-4 col-md-12">
-            <div className="header-right">
-              <div className="post-btn">
-                <a href="/post-job">Post a Job</a>
+              <button
+                type="button"
+                className="navbar-toggle"
+                data-toggle="collapse"
+                data-target="#navbarScroll"
+              >
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+              </button>
+            </div>
+            {/*col-lg-3 end*/}
+            {/*col-lg-7 end*/}
+            <div className="col-lg-5 col-md-9">
+              {/*Navegation start*/}
+              <div className="navigationwrape">
+                <div
+                  className="navbar navbar-expand-lg navbar-default navbar-light"
+                  role="navigation"
+                >
+                  <div className="navbar-header"> </div>
+                  <div className="navbar-collapse collapse" id="navbarScroll">
+                    <ul className="nav navbar-nav">
+                      <li className="dropdown">
+                        {" "}
+                        <a href="index.html" className="active">
+                          {" "}
+                          Home <span className="caret" />
+                        </a>
+                        <ul className="dropdown-menu">
+                          <li>
+                            {" "}
+                            <a href="index.html"> Home with image </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="index2.html"> Home with slider </a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        {" "}
+                        <a href="about-us.html"> About Us</a>
+                      </li>
+                      <li className="dropdown">
+                        {" "}
+                        <a href="#">
+                          {" "}
+                          Pages <span className="caret" />
+                        </a>
+                        <ul className="dropdown-menu">
+                          <li>
+                            {" "}
+                            <a href="about-us.html"> About Us </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="job-listing.html"> Job Listing </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="job-details.html"> Job Details </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="candidates-listing.html">
+                              {" "}
+                              Jobseeker Listing{" "}
+                            </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="candidates-details.html">
+                              {" "}
+                              Jobseeker Details{" "}
+                            </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="/login"> Login </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="register.html"> Register </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="post-job.html"> Job Post </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="pricing.html"> Packages </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="testimonials.html"> Testimonials </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="faqs.html"> FAQ </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="404.html"> 404 Page </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="typoghrapy.html"> Typoghrapy </a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li className="dropdown">
+                        {" "}
+                        <a href="blog.html">
+                          {" "}
+                          Blog <span className="caret" />
+                        </a>
+                        <ul className="dropdown-menu">
+                          <li>
+                            {" "}
+                            <a href="blog-grid.html"> Blog Grid sidebar</a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="blog.html"> Blog List sidebar</a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="blog-grid-full-width.html">
+                              {" "}
+                              Blog full width{" "}
+                            </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="blog-details.html">
+                              {" "}
+                              Blog Details with sidebar{" "}
+                            </a>
+                          </li>
+                          <li>
+                            {" "}
+                            <a href="blog-details-full-width.html">
+                              {" "}
+                              Blog Details{" "}
+                            </a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        {" "}
+                        <a href="contact-us.html"> Contact us </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="clearfix" />
+                </div>
               </div>
-              <div className="user-wrap">
-                <div className="login-btn">
-                  <a href="/login">Login</a>
+              {/*Navegation start*/}
+            </div>
+            {/*col-lg-3 end*/}
+            {/*col-lg-2 start*/}
+            <div className="col-lg-4 col-md-12">
+              <div className="header-right">
+                <div className="post-btn">
+                  <a href="post-job.html">Post a Job</a>
                 </div>
-                <div className="register-btn">
-                  <a href="/register">Register</a>
+                <div className="user-wrap">
+                  <div className="login-btn">
+                    <a href="/login">Login</a>
+                  </div>
+                  <div className="register-btn">
+                    <a href="register.html">Register</a>
+                  </div>
+                  <div className="clearfix" />
                 </div>
+                <div className="clearfix" />
               </div>
             </div>
+            {/*col-lg-2 end*/}
           </div>
+          {/*row end*/}
         </div>
       </div>
-    </div>
+      </>
   );
 }

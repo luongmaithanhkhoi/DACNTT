@@ -33,6 +33,13 @@ body {
   object-fit: contain;
 }
 
+.footer-logo img {
+  max-height: 60px;   /* chỉnh từ 50–70 tuỳ bạn */
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
 .header-wrap {
   position: fixed;
   top: 0;
@@ -40,6 +47,34 @@ body {
   right: 0;
   z-index: 9999;
   background: #fff;
+}
+
+.faculty-name a {
+  color: #0d6efd; /* xanh */
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.faculty-name a:hover {
+  color: #084298; /* xanh đậm hơn khi hover */
+}
+.logo-wrap {
+  display: flex;
+  align-items: center;   /* canh giữa theo chiều dọc */
+  gap: 12px;             /* khoảng cách logo - chữ */
+}
+
+.logo img {
+  height: 50px;          /* chỉnh theo ý bạn */
+}
+
+.logo-text a {
+  color: #e60000;        /* đỏ giống site gốc */
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;  /* tránh xuống dòng */
 }
 
 /* FORCE NAVBAR SHOW ON DESKTOP */
