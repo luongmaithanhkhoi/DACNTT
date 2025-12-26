@@ -1,4 +1,6 @@
 import "./globals.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 import Script from "next/script";
 
@@ -39,7 +41,10 @@ export default function RootLayout({
         <link rel="stylesheet" href="/css/style.css" />
       </head>
 
-      <body>{children}
+      <body>
+         <Header />
+        {children}
+        <Footer />
         {/* 1️⃣ jQuery – PHẢI load đầu */}
         <Script
           src="/js/jquery-2.1.4.min.js"
