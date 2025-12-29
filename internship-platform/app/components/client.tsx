@@ -7,6 +7,7 @@ export default function Header() {
     <nav>
       <Link href="/">Home</Link>
       <Link href="/login">Login</Link>
+      <Link href="/job_listing">Job Listing</Link>
     </nav>
   );
 }

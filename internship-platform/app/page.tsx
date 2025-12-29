@@ -9,6 +9,7 @@ import JobCategoryGrid from "./components/home/JobCategoryGrid";
 import FeaturedJobs from "./components/home/FeaturedJobs";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import CategoryAutocomplete from "./components/home/CategoryAutocomplete";
 
 export default function Home() {
