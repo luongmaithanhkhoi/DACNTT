@@ -80,38 +80,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Copyright */}
-      <div className="footer">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-6">
-              <div className="copyright">
-                © 2025 Job Finder - All Rights Reserved.
-              </div>
-            </div>
-
-            <div className="col-lg-6">
-              <ul className="social-wrap">
-                <li>
-                  <a href="#">
-                    <i className="fa fa-facebook-square" />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i className="fa fa-twitter-square" />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <i className="fa fa-linkedin-square" />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

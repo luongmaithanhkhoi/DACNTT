@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Head from "next/head";
+import NavbarLinks from "./NavbarLinks";
 export default function Header() {
   return (
     <>
-    <Head>
+      <Head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -26,7 +27,7 @@ export default function Header() {
           rel="stylesheet"
         />
       </Head>
-    <div className="header-wrap">
+      <div className="header-wrap">
         <div className="container">
           {/*row start*/}
           <div className="row">
@@ -65,140 +66,36 @@ export default function Header() {
                   role="navigation"
                 >
                   <div className="navbar-header"> </div>
-                  <div className="navbar-collapse collapse" id="navbarScroll">
-                    <ul className="nav navbar-nav">
-                      <li className="dropdown">
+                  {/* <div className="navbar-collapse collapse" id="navbarScroll">
+                    <ul
+                      className="nav navbar-nav"
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: 24,
+                      }}
+                    >
+                      <li>
                         {" "}
-                        <a href="index.html" className="active">
+                        <Link href="/" className="active">
                           {" "}
-                          Home <span className="caret" />
-                        </a>
-                        <ul className="dropdown-menu">
-                          <li>
-                            {" "}
-                            <a href="index.html"> Home with image </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="index2.html"> Home with slider </a>
-                          </li>
-                        </ul>
+                          Trang Chủ
+                        </Link>
                       </li>
                       <li>
                         {" "}
-                        <a href="about-us.html"> About Us</a>
-                      </li>
-                      <li className="dropdown">
-                        {" "}
-                        <a href="#">
-                          {" "}
-                          Pages <span className="caret" />
-                        </a>
-                        <ul className="dropdown-menu">
-                          <li>
-                            {" "}
-                            <a href="about-us.html"> About Us </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="/job-listing"> Job Listing </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="job-details.html"> Job Details </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="candidates-listing.html">
-                              {" "}
-                              Jobseeker Listing{" "}
-                            </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="candidates-details.html">
-                              {" "}
-                              Jobseeker Details{" "}
-                            </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="/login"> Login </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="register.html"> Register </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="post-job.html"> Job Post </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="pricing.html"> Packages </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="testimonials.html"> Testimonials </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="faqs.html"> FAQ </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="404.html"> 404 Page </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="typoghrapy.html"> Typoghrapy </a>
-                          </li>
-                        </ul>
-                      </li>
-                      <li className="dropdown">
-                        {" "}
-                        <a href="blog.html">
-                          {" "}
-                          Blog <span className="caret" />
-                        </a>
-                        <ul className="dropdown-menu">
-                          <li>
-                            {" "}
-                            <a href="blog-grid.html"> Blog Grid sidebar</a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="blog.html"> Blog List sidebar</a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="blog-grid-full-width.html">
-                              {" "}
-                              Blog full width{" "}
-                            </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="blog-details.html">
-                              {" "}
-                              Blog Details with sidebar{" "}
-                            </a>
-                          </li>
-                          <li>
-                            {" "}
-                            <a href="blog-details-full-width.html">
-                              {" "}
-                              Blog Details{" "}
-                            </a>
-                          </li>
-                        </ul>
+                        <Link href="/job-listing"> Tuyển Dụng </Link>
                       </li>
                       <li>
                         {" "}
-                        <a href="contact-us.html"> Contact us </a>
+                        <Link href="blog.html"> Tin Tức</Link>
                       </li>
                     </ul>
-                  </div>
+                  </div> */}
+                  <NavbarLinks />
+
                   <div className="clearfix" />
                 </div>
               </div>
@@ -228,6 +125,6 @@ export default function Header() {
           {/*row end*/}
         </div>
       </div>
-      </>
+    </>
   );
 }
