@@ -1,9 +1,15 @@
-import { supabase } from "./supabaseClient";
+export async function login(email: string, password: string) {
+  const res = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
 
-export const signUp = (email: string, password: string) =>
-  supabase.auth.signUp({ email, password });
+  const data = await res.json()
 
-export const signIn = (email: string, password: string) =>
-  supabase.auth.signInWithPassword({ email, password });
+  if (!res.ok) {
+    throw new Error(data.error || 'Đăng nhập thất bại')
+  }
 
-export const signOut = () => supabase.auth.signOut();
+  return data
+}
