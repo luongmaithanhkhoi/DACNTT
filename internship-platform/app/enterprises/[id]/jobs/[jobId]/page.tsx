@@ -102,7 +102,7 @@ export default async function JobDetailPage({
         <div className="container">
           <div className="row justify-content-center">
             
-              <div className="login p-8 bg-white rounded shadow-sm">
+              {/* <div className="login p-8 bg-white rounded shadow-sm">
                 {errorMessage && (
                   <div className="text-center text-red-600 mb-6 font-medium">
                     {errorMessage}
@@ -140,12 +140,24 @@ export default async function JobDetailPage({
                        
                     </div>
                     <br></br>
-                        <div className="mb-6 d-grid gap-2">
-                        <div className="font-bold mb-3">Mô tả công việc: </div>
-                        <div className="prose max-w-none text-gray-700 whitespace-pre-wrap border rounded border-secondary" style={{ height: '150px' }}>
-                          {job.description || 'Không có mô tả chi tiết.'}
+                        <div className="mb-6">
+                          <div className="font-bold mb-3 text-lg">Mô tả công việc</div>
+                          <div 
+                            className="prose max-w-none text-gray-700 bg-gray-50 border border-gray-300 rounded-lg p-4"
+                            style={{ 
+                              minHeight: '150px', 
+                              maxHeight: '400px',   // Giới hạn chiều cao tối đa
+                              overflowY: 'auto'     // Cho phép cuộn dọc khi nội dung dài
+                            }}
+                          >
+                            {job.description ? (
+                              <div className="whitespace-pre-wrap">{job.description}</div>
+                            ) : (
+                              <p className="text-gray-500 italic">Không có mô tả chi tiết.</p>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                     
                     {job.skills && job.skills.length > 0 && (
                       <div className="mb-6">
                         <h4 className="text-lg font-semibold mb-3">Kỹ năng yêu cầu</h4>
@@ -174,10 +186,115 @@ export default async function JobDetailPage({
                     </div>
                   </>
                 )}
+              </div> */}
+
+              <div className="col-12">
+                {/* ===== JOB HEADER ===== */}
+                <div className="bg-white rounded shadow-sm p-4 mb-4">
+                  <h2 className="text-2xl font-bold mb-3">
+                    {job.title}
+                  </h2>
+
+                  <div className="d-flex flex-wrap gap-4 fs-5 mb-3">
+                    <div>📍 {job.location?.name || 'Hà Nội'}</div>
+                    <div>💼 {job.job_type || 'Toàn thời gian'}</div>
+                    <div>⏳ Kinh nghiệm: 3 năm</div>
+                    <div>⏰ Hạn nộp: {formatDate(job.application_deadline)}</div>
+                  </div>
+
+                  <div className="d-flex gap-3">
+                    <button className="btn btn-danger px-4">
+                      Ứng tuyển ngay
+                    </button>
+                    <button className="btn btn-outline-secondary px-4">
+                      ❤️ Lưu tin
+                    </button>
+                  </div>
+                </div>
+
+                {/* ===== MAIN CONTENT ===== */}
+                <div className="row g-4">
+
+                  {/* ===== LEFT ===== */}
+                  <div className="col-lg-8">
+                    <div className="bg-white rounded shadow-sm p-4 mb-4">
+                      <h5 className="fw-bold mb-3">Chi tiết tin tuyển dụng</h5>
+
+                      <div className="d-flex flex-wrap gap-2">
+                        <span className="badge bg-light text-dark border px-3 py-2 fs-6">
+                          {job.category?.name || 'Frontend Developer'}
+                        </span>
+                       
+                        <span className="badge bg-light text-dark border px-3 py-2 fs-6">
+                         {job.work_mode || 'Không xác định'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded shadow-sm p-4 mb-4">
+                      <h5 className="fw-bold mb-3">Mô tả công việc</h5>
+                      <div className="fs-5 text-dark whitespace-pre-wrap lh-lg">
+                        {job.description || 'Không có mô tả chi tiết'}
+                      </div>
+                    </div>
+
+                    {job.skills?.length > 0 && (
+                      <div className="bg-white rounded shadow-sm p-4">
+                        <h5 className="fw-bold mb-3">Kỹ năng cần có</h5>
+                        <div className="d-flex flex-wrap gap-2">
+                          {job.skills.map((js) => (
+                            <span
+                              key={js.skill.id}
+                              className="badge bg-primary-subtle text-primary border px-3 py-2 fs-6"
+                            >
+                              {js.skill.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ===== RIGHT ===== */}
+                  <div className="col-lg-4">
+                    <div className="bg-white rounded shadow-sm p-4 mb-4">
+                      <h5 className="fw-bold mb-3">Thông tin công ty</h5>
+                      <ul className="list-unstyled fs-5 text-dark mb-0">
+                        <li>🏢 Công ty TNHH LG CNS Việt Nam</li>
+                        <li>👥 100 – 499 nhân viên</li>
+                        <li>💻 IT - Phần mềm</li>
+                        <li>📍 Hà Nội</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-white rounded shadow-sm p-4">
+                      <h5 className="fw-bold mb-3">Thông tin chung</h5>
+                      <ul className="list-unstyled fs-5 text-dark mb-0">
+                        <li>📌 Cấp bậc: Nhân viên</li>
+                        <li>🎓 Học vấn: Đại học</li>
+                        <li>👤 Số lượng tuyển: 1</li>
+                        <li>🕒 Toàn thời gian</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
+              <br></br>
+              <br></br>
+
+              <div className="text-center mt-10">
+                <a
+                  href={`/enterprises/${id}/jobs`}
+                  className="px-6 py-3 bg-gray-600 text-black fs-5 rounded hover:bg-gray-700 transition inline-block"
+                >
+                  Quay lại danh sách
+                </a>
+              </div>
           </div>
         </div>
+         
   
     </>
   );

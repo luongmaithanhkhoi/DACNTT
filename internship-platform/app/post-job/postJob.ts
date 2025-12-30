@@ -27,10 +27,16 @@ export function usePostJobLogic() {
         const locJson = await locRes.json();
         const catJson = await catRes.json();
 
-        if (locJson.success) setLocations(locJson.data || []);
-        if (catJson.success) setCategories(catJson.data || []);
+        // SỬA CHÍNH Ở ĐÂY: API trả về mảng trực tiếp, KHÔNG có .success
+        setLocations(Array.isArray(locJson) ? locJson : []);
+        setCategories(Array.isArray(catJson) ? catJson : []);
+
+        // Debug để chắc chắn
+        console.log("Loaded locations:", locJson);
+        console.log("Loaded categories:", catJson);
       } catch (err) {
         console.error("Lỗi tải dữ liệu form:", err);
+        setMessage({ type: "error", text: "Không thể tải danh mục hoặc địa điểm" });
       } finally {
         setLoadingData(false);
       }
