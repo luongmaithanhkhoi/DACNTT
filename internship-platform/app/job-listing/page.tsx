@@ -2,15 +2,18 @@
 
 import React from "react";
 import Script from "next/script";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import CategoryFilter from "./components/CategoryFilter";
 import LocationFilter from "./components/LocationFilter";
 import JobsList from "./components/JobList";
 
-export default function job_listing() {
+export default function JobListing() {
   const [q, setQ] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [locationId, setLocationId] = useState("");
+  const isUuid = (s: string) =>
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
 
   // chỉ apply khi bấm Search
   const [applied, setApplied] = useState({
@@ -18,7 +21,26 @@ export default function job_listing() {
     categoryId: "",
     locationId: "",
   });
+  const searchParams = useSearchParams();
 
+  useEffect(() => {
+    const qParam = searchParams.get("q") ?? "";
+    const categoryParam = searchParams.get("category") ?? "";
+    const locationParam = searchParams.get("location") ?? "";
+  
+    setQ(qParam);
+    setCategoryId(categoryParam);
+    setLocationId(locationParam);
+  
+    // áp dụng filter luôn khi vào page từ Home
+    setApplied({
+      q: qParam,
+      categoryId: categoryParam,
+      locationId: locationParam,
+    });
+  }, [searchParams]);
+
+  
   const onSubmitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setApplied({ q: q.trim(), categoryId, locationId });

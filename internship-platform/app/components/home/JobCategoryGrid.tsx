@@ -28,7 +28,7 @@ export default function JobCategoryGrid() {
               <i className={`fa ${cat.icon}`} />
             </div>
             <div className="jobTitle">
-              <a href={`/jobs?category=${cat.code}`}>
+              <a href={`/job-listing?category=${cat.id}`}>
                 {cat.name}
               </a>
             </div>

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/", label: "TRANG CHỦ" },
   { href: "/job-listing", label: "TUYỂN DỤNG" },
-  { href: "/blog", label: "TIN TỨC" }, // đổi đúng route của bạn
+  { href: "/events", label: "TIN TỨC" }, // đổi đúng route của bạn
 ];
 
 export default function NavbarLinks() {
