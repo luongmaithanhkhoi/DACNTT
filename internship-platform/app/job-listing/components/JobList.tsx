@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-
+import Link from "next/link";
 type Job = {
   id: string;
   title: string;
@@ -243,15 +243,23 @@ export default function JobsList({
                         <li>{job.employment_type || "—"}</li>
                       </ul>
 
-                      <p className="para">
-                        {job.description?.slice(0, 180) || "Không có mô tả."}
-                        {job.description && job.description.length > 180 ? "..." : ""}
+                      <p className="para ">
+                        <div
+                          className="ProseMirror text-dark lh-lg line-clamp-2"
+                          dangerouslySetInnerHTML={{
+                            __html: job.description || "Không có mô tả chi tiết.",
+                          }}
+/>
+                        {/* {job.description?.slice(0, 180) || "Không có mô tả."}
+                        {job.description && job.description.length > 180 ? "..." : ""} */}
                       </p>
                     </div>
 
                     <div className="col-xl-3">
                       <div className="click-btn apply">
-                        <a href={`/jobs/${job.id}`}>Apply Now</a>
+                       <Link href={`/jobs/${job.id}`} className="click-btn apply">
+                          Apply Now
+                        </Link>
                       </div>
                     </div>
                   </div>

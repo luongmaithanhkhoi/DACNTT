@@ -1,43 +1,91 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+// app/api/auth/login/route.ts
 
-const url  = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-type LoginBody = { email: string; password: string }
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export async function POST(req: Request) {
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+export async function POST(request: Request) {
   try {
-    const { email, password } = (await req.json()) as LoginBody
+    const { email, password } = await request.json();
+
+    // Validate input
     if (!email || !password) {
-      return NextResponse.json({ error: 'email and password are required' }, { status: 400 })
+      return NextResponse.json(
+        { success: false, error: 'Email và mật khẩu là bắt buộc' },
+        { status: 400 }
+      );
     }
 
-    // dùng anon key để đăng nhập (đây là chuẩn của Supabase)
-    const sb = createClient(url, anon, { auth: { persistSession: false, autoRefreshToken: false } })
-    const { data, error } = await sb.auth.signInWithPassword({ email, password })
-    if (error || !data?.session) {
-      return NextResponse.json({ error: error?.message ?? 'invalid credentials' }, { status: 401 })
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return NextResponse.json(
+        { success: false, error: 'Email và mật khẩu phải là chuỗi' },
+        { status: 400 }
+      );
     }
 
-    // Option: bạn có thể map/kiểm tra role trong bảng User nếu muốn chặn non-STUDENT ở đây.
-    // Ví dụ (không bắt buộc):
-    // const admin = createClient(url, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
-    // const { data: appUser } = await admin.from('User').select('role,is_active').eq('provider_uid', data.user.id).single()
-    // if (!appUser?.is_active) return NextResponse.json({ error: 'Account inactive' }, { status: 403 })
+    // Tạo client Supabase (anon key để auth)
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    // Trả tối thiểu: access_token để gọi các API bảo vệ (Bearer)
-    return NextResponse.json({
-      token_type: 'bearer',
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token, // nếu bạn muốn lưu để refresh
-      user: {
-        id: data.user.id,
-        email: data.user.email
+    // Gọi Supabase auth signInWithPassword
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+
+    if (error) {
+      console.error('Supabase login error:', error);
+
+      // Xử lý lỗi phổ biến
+      let userMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
+      if (error.message.includes('Invalid login credentials')) {
+        userMessage = 'Email hoặc mật khẩu không đúng';
+      } else if (error.message.includes('Email not confirmed')) {
+        userMessage = 'Email chưa được xác thực. Vui lòng kiểm tra hộp thư';
+      } else if (error.message.includes('Too many requests')) {
+        userMessage = 'Quá nhiều lần thử. Vui lòng đợi một lát';
       }
-    })
-  } catch (e: any) {
-    console.error(e)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+
+      return NextResponse.json(
+        { success: false, error: userMessage },
+        { status: 401 }
+      );
+    }
+
+    if (!data.session || !data.user) {
+      return NextResponse.json(
+        { success: false, error: 'Không nhận được session từ server' },
+        { status: 500 }
+      );
+    }
+
+    // Trả về dữ liệu cần thiết cho frontend
+    return NextResponse.json({
+      success: true,
+      data: {
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role,
+          ...data.user.user_metadata,
+        },
+        session: {
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          expires_at: data.session.expires_at,
+        },
+      },
+    });
+  } catch (err) {
+    console.error('Unexpected login error:', err);
+    return NextResponse.json(
+      { success: false, error: 'Lỗi server nội bộ' },
+      { status: 500 }
+    );
   }
 }

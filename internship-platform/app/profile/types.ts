@@ -31,8 +31,17 @@ export interface Stats {
   rejected: number
 }
 
+export interface SavedJob {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  created_at: string;
+}
+
 export interface ProfileData {
   profile: StudentProfile
   skills: Skill[]
-  stats: Stats
+  stats: Stats,
+  savedJobs?: SavedJob[];
 }

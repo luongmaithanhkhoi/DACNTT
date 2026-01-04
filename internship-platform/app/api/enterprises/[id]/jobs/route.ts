@@ -28,6 +28,16 @@ export async function GET(
         work_mode,
         category:JobCategory(id, name),
         location:Location(id, name),
+        enterprise:Enterprise (
+          id,
+          name,
+          description,
+          industry,
+          location,
+          website,
+          image_url,
+          contact_email
+        ),
         applications:Application(count)
       `, { count: 'exact' }) 
       .eq('enterprise_id', id)
@@ -46,6 +56,7 @@ export async function GET(
     if (error) throw error;
 
     const totalPages = count ? Math.ceil(count / limit) : 1;
+    console.log("Ngu 1");
 
     return NextResponse.json({
       success: true,

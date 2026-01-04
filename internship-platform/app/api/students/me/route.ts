@@ -59,6 +59,7 @@ type PatchBody = Partial<{
   graduation_year: number
 }>
 
+
 // ====== GET /api/students/me ======
 export async function GET(req: Request) {
   try {
@@ -93,6 +94,33 @@ export async function GET(req: Request) {
     if (skillErr) return NextResponse.json({ error: skillErr.message }, { status: 500 })
     const skills = (skillsRows ?? []).map(r => ({ id: r.Skill?.id, name: r.Skill?.name, level: r.level }))
 
+
+    const { data: bookmarks, error: bookmarkErr } = await adminSb
+      .from('StudentBookmark')
+      .select(`
+        created_at,
+        job:JobPosting (
+          id,
+          title,
+           location:Location (name),
+          enterprise:Enterprise (name)
+        )
+      `)
+      .eq('student_id', appUser.id)
+      .order('created_at', { ascending: false });
+
+    if (bookmarkErr) {
+      console.error("Error fetching bookmarks:", bookmarkErr);
+      // Không return error, chỉ để mảng rỗng nếu lỗi
+    }
+    const savedJobs = (bookmarks ?? []).map(b => ({
+      id: b.job.id,
+      title: b.job.title,
+      company: b.job.enterprise.name,
+      location: b.job.location?.name || 'Toàn quốc',
+      saved_at: b.created_at,
+    }));
+
     // Thống kê Application
     async function countBy(status?: 'PENDING' | 'ACCEPTED' | 'REJECTED') {
       let q = adminSb.from('Application').select('id', { head: true, count: 'exact' }).eq('student_id', appUser.id)
@@ -123,7 +151,8 @@ export async function GET(req: Request) {
         updated_at: student.updated_at
       },
       skills,
-      stats: { applications: total, pending, accepted, rejected }
+      stats: { applications: total, pending, accepted, rejected },
+      savedJobs,
     })
   } catch (e) {
     console.error('GET /students/me error', e)

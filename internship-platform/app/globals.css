@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@tailwind utilities;
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -104,4 +106,18 @@ body {
   .header-wrap .navbar-collapse.collapse.in {
     display: block !important;
   }
+}
+
+.ProseMirror ol {
+  list-style-type: decimal !important;
+  padding-left: 1.5rem !important;
+}
+
+.ProseMirror ul {
+  list-style-type: disc !important;
+  padding-left: 1.5rem !important;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
 }

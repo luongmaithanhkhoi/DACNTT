@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ProfileData } from './types'
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export function useProfile() {
   const router = useRouter()
@@ -16,18 +21,13 @@ export function useProfile() {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('auth_token')
+       const { data: { session } } = await supabase.auth.getSession();
 
-      if (!token) {
-        router.push('/login')
-        return
-      }
-
-      const res = await fetch('/api/students/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+       if (!session) return;
+       
+      const res = await fetch(`/api/students/me`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
 
       if (!res.ok) {
         if (res.status === 401) {

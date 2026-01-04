@@ -26,20 +26,40 @@ export async function GET(
         id,
         title,
         description,
-        created_at,
-        is_open,
-        job_type,
-        work_mode,
         internship_period,
         require_gpa_min,
+        is_open,
         application_deadline,
-        category:JobCategory(id, name),
-        location:Location(id, name),
-        skills:JobSkill(
-          required_level,
-          skill:Skill(id, name)
+        allowance_min,
+        allowance_max,
+        work_mode,
+        job_type,               
+        tags,
+        created_at,
+        updated_at,
+        enterprise:Enterprise (
+          id,
+          name,
+          description,
+          industry,
+          location,
+          website,
+          image_url,
+          contact_email
         ),
-        applications:Application(count)
+        location:Location (
+          id,
+          name
+        ),
+        category:JobCategory(id, name),
+        job_skills:JobSkill (
+          skill_id,
+          required_level,
+          skill:Skill (
+            id,
+            name
+          )
+        )
       `)
       .eq('id', jobId)
       .eq('enterprise_id', enterpriseId)
@@ -54,11 +74,13 @@ export async function GET(
     }
 
     if (!data) {
+      console.log("Ngu 2");
       return NextResponse.json(
         { success: false, error: 'Không tìm thấy công việc này' },
         { status: 404 }
       );
     }
+    
 
     return NextResponse.json({ success: true, data });
   } catch (err) {

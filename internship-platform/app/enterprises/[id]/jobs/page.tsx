@@ -255,7 +255,7 @@ export default function EnterpriseJobList() {
           <br />
 
           {/* FILTER BAR */}
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-4 mb-6 fs-4">
             <button
               onClick={() => setFilterStatus("all")}
               className={`px-5 py-2 rounded text-lg ${
@@ -316,7 +316,7 @@ export default function EnterpriseJobList() {
                     key={job.id}
                     className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition"
                   >
-                    {/* ===== CARD GIỮ NGUYÊN ===== */}
+                    {/* ===== CARD ===== */}
                     <h3 className="text-blue-600 font-semibold text-base mb-1 line-clamp-2">
                       {job.title}
                     </h3>
@@ -325,15 +325,15 @@ export default function EnterpriseJobList() {
                       {job.category?.name || "Chưa phân loại"}
                     </p>
 
-                    <div className="text-lg text-gray-600 space-y-1 mb-4">
+                    <div className="text-lg text-gray-600 space-y-1 mb-4 fs-5">
                       <div>📍 {job.location?.name || "Toàn quốc"}</div>
                       <div>🕒 Fulltime</div>
                       <div>📅 {formatDate(job.created_at)}</div>
                     </div>
 
-                    <span>Trạng thái: </span>
+                    <span className="fs-5">Trạng thái: </span>
                     <span
-                      className={`inline-block px-3 py-1 text-base rounded-full font-semibold mb-3 ${statusStyle(
+                      className={`inline-block px-3 fs-5 py-1 text-base rounded-full font-semibold mb-3 ${statusStyle(
                         job.is_open
                       )}`}
                     >
@@ -343,14 +343,14 @@ export default function EnterpriseJobList() {
                     <div className="mt-auto pt-4 flex justify-center">
                       <Link
                         href={`/enterprises/${enterpriseId}/jobs/${job.id}`}
-                        className="px-4 py-2 text-lg rounded bg-blue text-black hover:bg-blue inline-block"
+                        className="fs-5 px-4 py-2 text-lg rounded bg-blue text-black hover:bg-blue inline-block"
                       >
                         Xem
                       </Link>
 
                       <Link
                         href={`/enterprises/${enterpriseId}/jobs/edit/${job.id}`}
-                        className="px-4 py-2 text-lg rounded bg-yellow-500 text-black hover:bg-yellow-600"
+                        className="fs-5 px-4 py-2 text-lg rounded bg-yellow-500 text-black hover:bg-yellow-600"
                       >
                         Sửa
                       </Link>
@@ -359,7 +359,7 @@ export default function EnterpriseJobList() {
                         <button
                           onClick={() => handleDelete(job.id, job.title)}
                           disabled={deletingId === job.id}
-                          className="px-4 py-2 text-lg rounded bg-red-500 text-white hover:bg-red-600 disabled:opacity-60"
+                          className=" fs-5 px-4 py-2 text-lg rounded bg-red-500 text-white hover:bg-red-600 disabled:opacity-60"
                         >
                           {deletingId === job.id ? "Đang đóng..." : "Đóng"}
                         </button>
@@ -385,21 +385,21 @@ export default function EnterpriseJobList() {
                   <button
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
-                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                    className="fs-4 font-semibold r px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                   >
-                    Previous
+                    Trước
                   </button>
 
-                  <span className="px-4 py-2">
+                  <span className="font-semibold  px-4 py-2 fs-4">
                     Trang <b>{currentPage}</b> / {totalPages}
                   </span>
 
                   <button
                     disabled={currentPage === totalPages}
                     onClick={() => handlePageChange(currentPage + 1)}
-                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                    className="font-semibold fs-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                   >
-                    Next
+                    Sau
                   </button>
                 </div>
                
