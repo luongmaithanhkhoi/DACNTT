@@ -10,7 +10,10 @@ const formatDate = (dateString: string) =>
   new Date(dateString).toLocaleDateString("vi-VN");
 
 export default function EnterpriseJobList() {
+  
   const enterpriseId = "abb1f9c4-9887-4e5c-80ef-225899fc4361";
+
+
 //   const { jobs, pagination, loading, error, fetchJobs } = useEnterpriseJobs(enterpriseId);
     const {
         jobs,

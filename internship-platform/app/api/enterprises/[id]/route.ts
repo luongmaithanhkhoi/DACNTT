@@ -1,111 +1,85 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-// GET /api/enterprises/:id - Lấy chi tiết doanh nghiệp
-export async function GET(
-    request: NextRequest,
-    context: { params: { id: string } }
-) {
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+// Tạo client admin (service role key) – QUAN TRỌNG
+const adminSb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+function getBearerToken(req: Request): string | null {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) return null;
+  const [scheme, token] = authHeader.split(' ');
+  return scheme?.toLowerCase() === 'bearer' ? token : null;
+}
+
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await context.params
-    const { data, error } = await supabase
-      .from('Enterprise')
-      .select(`
-        *,
-        jobs:JobPosting(
-          id,
-          title,
-          location,
-          is_open,
-          created_at
-        ),
-        users:EnterpriseUser(
-          user_id,
-          full_name,
-          position,
-          user:User(email, avatar_url)
-        )
-      `)
-      .eq('id', id)
-      .single()
+    const token = getBearerToken(req);
+    if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 });
 
-    if (error) throw error
+    // Xác thực user từ token
+    const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
 
-    if (!data) {
-      return NextResponse.json(
-        { success: false, error: 'Không tìm thấy doanh nghiệp' },
-        { status: 404 }
-      )
+    const { data: { user } } = await authClient.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+
+    // Lấy app user
+    const { data: appUser } = await adminSb
+      .from('User')
+      .select('id')
+      .eq('provider_uid', user.id)
+      .single();
+
+    if (!appUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    // Lấy enterprise_id từ EnterpriseUser
+    const { data: entLink, error: linkError } = await adminSb
+      .from('EnterpriseUser')
+      .select('enterprise_id')
+      .eq('user_id', appUser.id)
+      .single();
+
+    if (linkError || !entLink) {
+      return NextResponse.json({ error: 'Enterprise not linked' }, { status: 404 });
+    }
+    const { id } = await params;
+    // Kiểm tra params.id có khớp enterprise_id không (bảo mật)
+    if (entLink.enterprise_id !== id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    return NextResponse.json({ success: true, data })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Lỗi server'
-    return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 }
-    )
-  }
-}
-
-// PUT /api/enterprises/:id - Cập nhật doanh nghiệp
-export async function PUT(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  try {
-    const { id } = await context.params
-    const body = await request.json()
-    const { name, description, industry, image_url } = body
-
-    const { data, error } = await supabase
+    // Lấy thông tin enterprise
+    const { data: enterprise, error: entError } = await adminSb
       .from('Enterprise')
-      .update({
-        name,
-        description,
-        industry,
-        image_url,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single()
+      .select('*')
+      .eq('id', params.id)
+      .single();
 
-    if (error) throw error
-
-    return NextResponse.json({ success: true, data })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Lỗi server'
-    return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 }
-    )
-  }
-}
-
-// DELETE /api/enterprises/:id - Xóa doanh nghiệp
-export async function DELETE(
-    request: NextRequest,
-    context: { params: { id: string } }
-) {
-  try {
-    const { id } = await context.params
-    const { error } = await supabase
-      .from('Enterprise')
-      .delete()
-      .eq('id', id)
-
-    if (error) throw error
+    if (entError || !enterprise) {
+      return NextResponse.json({ error: 'Enterprise not found' }, { status: 404 });
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Đã xóa doanh nghiệp'
-    })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Lỗi server'
-    return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 }
-    )
+      enterprise: {
+        id: enterprise.id,
+        name: enterprise.name,
+        description: enterprise.description,
+        industry: enterprise.industry,
+        image_url: enterprise.image_url,
+        website: enterprise.website,
+        contact_email: enterprise.contact_email,
+        location: enterprise.location,
+        address: enterprise.address,
+      },
+    });
+  } catch (err) {
+    console.error('GET enterprise error:', err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

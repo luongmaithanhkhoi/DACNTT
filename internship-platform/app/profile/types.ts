@@ -37,11 +37,29 @@ export interface SavedJob {
   company: string;
   location: string;
   created_at: string;
+  applicationDeadline?: string;
+}
+interface AppliedJob {
+  id: string;
+  title: string;
+  company: string;
+  companyImage?: string;
+  location: string;
+  allowance: string;
+  workMode?: string;
+  jobType?: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  created_at: string;
+  applicationDeadline?: string; // ← THÊM ĐỂ TÍNH NGÀY CÒN LẠI
+  isExpired: boolean;
 }
 
 export interface ProfileData {
   profile: StudentProfile
   skills: Skill[]
   stats: Stats,
-  savedJobs?: SavedJob[];
+  savedJobs?: SavedJob[],
+  appliedJobs: AppliedJob[];
 }
+
+

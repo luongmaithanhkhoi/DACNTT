@@ -147,10 +147,18 @@ export function usePostJobLogic({
 
     try {
       const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-      enterpriseId = "abb1f9c4-9887-4e5c-80ef-225899fc4361";
+      const currentEnterpriseId = typeof window !== 'undefined' 
+          ? localStorage.getItem('enterprise_id')
+          : null;
+
+        if (!currentEnterpriseId) {
+          setMessage({ type: "error", text: "Không tìm thấy doanh nghiệp. Vui lòng đăng nhập lại." });
+          setLoading(false);
+          return;
+}
       const url = isEdit
-        ? `${baseUrl}/api/enterprises/${enterpriseId}/jobs/${jobId}`
-        : `${baseUrl}/api/enterprises/${enterpriseId}/jobs`;
+        ? `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs/${jobId}`
+        : `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs`;
 
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
