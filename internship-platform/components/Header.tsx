@@ -36,7 +36,7 @@ export default function Header() {
               <div className="logo-wrap">
                 <div className="logo">
                   <Link href="/">
-                    <img src="images/TDTU.png" alt="TDTU" />
+                    <img src="/images/TDTU.png" alt="TDTU" />
                   </Link>
                 </div>
 
@@ -109,11 +109,8 @@ export default function Header() {
                   <a href="post-job.html">Post a Job</a>
                 </div>
                 <div className="user-wrap">
-                  <div className="login-btn">
-                    <a href="/login">Login</a>
-                  </div>
                   <div className="register-btn">
-                    <a href="register.html">Register</a>
+                    <a href="/profile">Profile</a>
                   </div>
                   <div className="clearfix" />
                 </div>
