@@ -8,7 +8,7 @@ export default function Footer() {
               <div className="logo-wrap">
                 <div className="logo">
                   <a href="#">
-                    <img src="images/TDTU.png" alt="TDTU" />
+                    <img src="/images/TDTU.png" alt="TDTU" />
                   </a>
                 </div>
 
