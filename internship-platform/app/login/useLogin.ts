@@ -72,10 +72,13 @@ export function useLogin() {
 
       // 6. Redirect theo role
       if (appUser.role === 'STUDENT') {
-        router.push('/profile');
+        router.push('/');
       } else if (appUser.role === 'ENTERPRISE') {
         router.push('/enterprises/dashboard'); // hoặc /enterprise/profile
-      } else {
+      } else if (appUser.role === 'ADMIN') {
+        router.push('/faculty');
+      }
+      else {
         router.push('/');
       }
 
