@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Head from "next/head";
 import NavbarLinks from "./NavbarLinks";
+import LogoutButton from '@/components/LogoutButton';
 export default function Header() {
   return (
     <>
@@ -106,14 +107,21 @@ export default function Header() {
             <div className="col-lg-4 col-md-12">
               <div className="header-right">
                 <div className="post-btn">
-                  <a href="post-job.html">Post a Job</a>
+                  <a href="/post-job">Post a Job</a>
                 </div>
                 <div className="user-wrap">
                   <div className="register-btn">
-                    <a href="/profile">Profile</a>
+                    <LogoutButton />
                   </div>
+              
                   <div className="clearfix" />
                 </div>
+                <div className="d-flex align-items-center gap-3">
+                {/* <Link href="/profile" className="btn btn-outline-primary">
+                  Profile
+                </Link> */}
+               
+              </div>
                 <div className="clearfix" />
               </div>
             </div>

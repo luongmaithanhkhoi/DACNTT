@@ -297,6 +297,7 @@
 // }
 
 // app/api/jobs/[id]/applications/route.ts
+// app/api/jobs/[id]/applications/route.ts
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -354,16 +355,33 @@ async function getStudentIdFromToken(token: string): Promise<string | null> {
   return appUser.role === 'STUDENT' ? appUser.id : null
 }
 
-async function isJobOpen(jobId: string): Promise<boolean> {
+async function isJobOpen(jobId: string): Promise<{ isOpen: boolean; reason?: string }> {
   const adminClient = createClient(supabaseUrl, supabaseServiceKey)
   const { data, error } = await adminClient
     .from('JobPosting')
-    .select('id, is_open')
+    .select('id, is_open, application_deadline')
     .eq('id', jobId)
     .single()
 
-  if (error || !data) return false
-  return data.is_open === true
+  if (error || !data) {
+    return { isOpen: false, reason: 'Job not found' }
+  }
+
+  if (!data.is_open) {
+    return { isOpen: false, reason: 'Job is closed' }
+  }
+
+  // ✅ CHECK DEADLINE
+  if (data.application_deadline) {
+    const deadline = new Date(data.application_deadline)
+    const now = new Date()
+    
+    if (now > deadline) {
+      return { isOpen: false, reason: 'Application deadline has passed' }
+    }
+  }
+
+  return { isOpen: true }
 }
 
 /* ================== GET ================== */
@@ -402,11 +420,24 @@ export async function GET(
         .eq('job_id', jobId)
         .maybeSingle()
 
+      // ✅ ALSO CHECK JOB STATUS & DEADLINE
+      const { data: jobData } = await adminClient
+        .from('JobPosting')
+        .select('is_open, application_deadline')
+        .eq('id', jobId)
+        .single()
+
+      const isPastDeadline = jobData?.application_deadline 
+        ? new Date() > new Date(jobData.application_deadline)
+        : false
+
       console.log('GET Application check:', {
         studentId,
         jobId,
         hasApplication: !!data,
         status: data?.status,
+        isJobOpen: jobData?.is_open,
+        isPastDeadline,
         error: error?.message
       })
 
@@ -414,6 +445,8 @@ export async function GET(
         applied: !!data,
         status: data?.status || null,
         appliedAt: data?.created_at || null,
+        canApply: jobData?.is_open && !isPastDeadline && !data, // ✅ Can only apply if not applied, job open, and before deadline
+        isPastDeadline,
         success: true
       })
     }
@@ -561,8 +594,12 @@ export async function POST(req: Request, { params }: { params: { id?: string } }
     }
 
     // Kiểm tra job có tồn tại và đang mở
-    if (!(await isJobOpen(jobId))) {
-      return NextResponse.json({ error: 'Cannot apply to closed or non-existent job' }, { status: 400 })
+    const jobStatus = await isJobOpen(jobId)
+    if (!jobStatus.isOpen) {
+      return NextResponse.json({ 
+        error: jobStatus.reason || 'Cannot apply to this job',
+        applied: false
+      }, { status: 400 })
     }
 
     const adminClient = createClient(supabaseUrl, supabaseServiceKey)

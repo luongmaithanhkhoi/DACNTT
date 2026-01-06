@@ -1,47 +1,83 @@
-// 'use client'
+// "use client";
 
-// import { useState } from 'react'
-// import { useRouter } from 'next/navigation'
-// import { login } from '@/lib/auth'
+// import { useState } from 'react';
+// import { useRouter } from 'next/navigation';
+// import { supabase } from '@/lib/supabaseClient';
 
 // export function useLogin() {
-//   const router = useRouter()
-//   const [loading, setLoading] = useState(false)
-//   const [error, setError] = useState<string | null>(null)
+//   const router = useRouter();
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
 
 //   const submit = async (email: string, password: string) => {
-//     setLoading(true)
-//     setError(null)
+//     setLoading(true);
+//     setError(null);
 
 //     try {
 //       if (!email || !password) {
-//         throw new Error('Vui lòng nhập email và mật khẩu')
+//         throw new Error('Vui lòng nhập email và mật khẩu');
 //       }
 
-//       const data = await login(email, password)
+//       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+//         email: email.trim().toLowerCase(),
+//         password,
+//       });
 
-//       localStorage.setItem('auth_token', data.access_token)
-//       if (data.refresh_token) {
-//         localStorage.setItem('refresh_token', data.refresh_token)
+//       if (authError) throw authError;
+//       if (!authData.session || !authData.user) {
+//         throw new Error('Đăng nhập thất bại');
 //       }
-//       localStorage.setItem('user', JSON.stringify(data.user))
 
-//       router.push('/profile')
-//     } catch (err) {
-//       setError(err instanceof Error ? err.message : 'Có lỗi xảy ra')
-//     } finally {
-//       setLoading(false)
-//     }
-//   }
+//       // Lấy user từ Supabase auth
+//       const { data: { user } } = await supabase.auth.getUser();
+//       console.log("AUTH UID:", user?.id);
+//       if (!user) throw new Error('Không thể lấy thông tin user');
 
-//   return { submit, loading, error }
+//       // Lấy app user từ bảng User
+
+//           const { data: appUser, error: roleError } = await supabase
+//           .from('User')
+//           .select('role')
+//           .eq('provider_uid', user.id)
+//           .single();
+//           console.log("app:", appUser);
+//         if (roleError || !appUser) {
+//           setError('Không tìm thấy thông tin tài khoản');
+//           return;
+//         }
+
+//         // Redirect theo role thật
+//         if (appUser.role === 'STUDENT') {
+//           router.push('/profile');
+//         } else if (appUser.role === 'ENTERPRISE') {
+//           router.push('/enterprises/dashboard'); 
+//         } else {
+//           router.push('/'); 
+//         }
+
+//         router.refresh();
+//           } catch (err) {
+//             const msg = err instanceof Error ? err.message : 'Đăng nhập thất bại';
+//             if (msg.includes('Invalid login credentials')) {
+//               setError('Email hoặc mật khẩu không đúng');
+//             } else if (msg.includes('Email not confirmed')) {
+//               setError('Email chưa được xác thực');
+//             } else {
+//               setError(msg);
+//             }
+//           } finally {
+//             setLoading(false);
+//           }
+//         };
+
+//   return { submit, loading, error };
 // }
 
 "use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient'; // ← IMPORT Ở ĐÂY
+import { supabase } from '@/lib/supabaseClient';
 
 export function useLogin() {
   const router = useRouter();
@@ -57,29 +93,68 @@ export function useLogin() {
         throw new Error('Vui lòng nhập email và mật khẩu');
       }
 
-      // DÙNG SUPABASE AUTH TRỰC TIẾP
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      // 1. Đăng nhập với Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
 
-      if (authError) {
-        throw authError;
+      if (authError) throw authError;
+      if (!authData.session || !authData.user) {
+        throw new Error('Đăng nhập thất bại');
       }
 
-      if (!data.session || !data.user) {
-        throw new Error('Không nhận được thông tin đăng nhập');
+      // 2. Lấy thông tin user từ auth
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Không thể lấy thông tin user');
+
+      // 3. Lấy role từ bảng User (app user)
+      const { data: appUser, error: roleError } = await supabase
+        .from('User')
+        .select('id, role')
+        .eq('provider_uid', user.id)
+        .single();
+
+      if (roleError || !appUser) {
+        console.error('Lỗi lấy app user:', roleError);
+        throw new Error('Không tìm thấy thông tin tài khoản trong hệ thống');
       }
 
-      // Supabase tự quản lý session, không cần localStorage thủ công
-      // Nếu muốn lưu thêm user info
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // 4. LƯU ROLE VÀO LOCALSTORAGE
+      localStorage.setItem('user_role', appUser.role);
+      localStorage.setItem('app_user_id', appUser.id); // Lưu ID app user (dùng cho API)
 
-      router.push('/profile'); // hoặc '/student/dashboard'
+      let enterpriseId: string | null = null;
+
+      // 5. Nếu là ENTERPRISE → lấy enterprise_id và lưu
+      if (appUser.role === 'ENTERPRISE') {
+        const { data: entLink, error: entError } = await supabase
+          .from('EnterpriseUser')
+          .select('enterprise_id')
+          .eq('user_id', appUser.id)
+          .single();
+
+        if (entError || !entLink) {
+          console.error('Không tìm thấy liên kết enterprise:', entError);
+          // Vẫn cho login, nhưng không có enterprise_id
+        } else {
+          enterpriseId = entLink.enterprise_id;
+          localStorage.setItem('enterprise_id', enterpriseId);
+        }
+      }
+
+      // 6. Redirect theo role
+      if (appUser.role === 'STUDENT') {
+        router.push('/profile');
+      } else if (appUser.role === 'ENTERPRISE') {
+        router.push('/enterprises/dashboard'); // hoặc /enterprise/profile
+      } else {
+        router.push('/');
+      }
+
       router.refresh();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Đăng nhập thất bại';
-      // Xử lý lỗi phổ biến
       if (msg.includes('Invalid login credentials')) {
         setError('Email hoặc mật khẩu không đúng');
       } else if (msg.includes('Email not confirmed')) {

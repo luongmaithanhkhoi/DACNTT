@@ -1,4 +1,3 @@
-// // components/JobApplyButton.tsx
 
 // "use client";
 
@@ -10,63 +9,151 @@
 //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 // );
 
-// export default function JobApplyButton({ jobId, isOpen }: { jobId: string; isOpen: boolean }) {
+// interface JobApplyButtonProps {
+//   jobId: string;
+//   isOpen: boolean;
+// }
+
+// export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
 //   const [hasApplied, setHasApplied] = useState(false);
+//   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
 //   const [loading, setLoading] = useState(true);
 //   const [actionLoading, setActionLoading] = useState(false);
 
+//   // ✅ CHECK APPLICATION STATUS ON LOAD
 //   useEffect(() => {
-//     const check = async () => {
-//       const { data: { session } } = await supabase.auth.getSession();
-//       if (!session) {
-//         setLoading(false);
-//         return;
-//       }
+//     const checkApplication = async () => {
+//       setLoading(true);
 
-//       // Bạn có thể thêm API GET check application tương tự bookmark nếu cần
-//       // Hoặc để trống, chỉ dựa vào hành động apply
-//       setLoading(false);
+//       try {
+//         const { data: { session } } = await supabase.auth.getSession();
+        
+//         if (!session?.access_token) {
+//           console.log('No session - user not logged in');
+//           setHasApplied(false);
+//           setLoading(false);
+//           return;
+//         }
+
+//         // ✅ THÊM ?check=me để phân biệt với employer list view
+//         const res = await fetch(`/api/jobs/${jobId}/applications?check=me`, {
+//           method: 'GET',
+//           headers: {
+//             'Authorization': `Bearer ${session.access_token}`,
+//             'Cache-Control': 'no-cache'
+//           },
+//         });
+
+//         if (res.ok) {
+//           const result = await res.json();
+//           console.log('Application check result:', result);
+          
+//           setHasApplied(result.applied === true);
+//           setApplicationStatus(result.status || null);
+//         } else {
+//           console.error('Failed to check application:', res.status);
+//           setHasApplied(false);
+//         }
+//       } catch (err) {
+//         console.error("Check application error:", err);
+//         setHasApplied(false);
+//       } finally {
+//         setLoading(false);
+//       }
 //     };
-//     check();
+
+//     checkApplication();
 //   }, [jobId]);
 
-//   const apply = async () => {
+//   const handleApply = async () => {
 //     const { data: { session } } = await supabase.auth.getSession();
+    
 //     if (!session) {
 //       alert('Vui lòng đăng nhập để ứng tuyển!');
 //       return;
 //     }
 
 //     setActionLoading(true);
-//     const res = await fetch(`/api/jobs/${jobId}/applications`, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         Authorization: `Bearer ${session.access_token}`,
-//       },
-//     });
 
-//     const result = await res.json();
-//     if (res.ok) {
-//       setHasApplied(true);
-//       alert('Ứng tuyển thành công!');
-//     } else {
-//       alert(result.error || 'Lỗi khi ứng tuyển');
+//     try {
+//       const res = await fetch(`/api/jobs/${jobId}/applications`, {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': `Bearer ${session.access_token}`,
+//         },
+//       });
+
+//       const result = await res.json();
+//       console.log('Apply result:', result);
+
+//       if (res.ok) {
+//         setHasApplied(true);
+//         setApplicationStatus('PENDING');
+//         alert('Ứng tuyển thành công!');
+//       } else {
+//         // Handle "already applied" case
+//         if (result.applied) {
+//           setHasApplied(true);
+//           alert('Bạn đã ứng tuyển công việc này rồi!');
+//         } else {
+//           alert(result.error || 'Lỗi khi ứng tuyển');
+//         }
+//       }
+//     } catch (err) {
+//       console.error('Apply error:', err);
+//       alert('Lỗi kết nối server');
+//     } finally {
+//       setActionLoading(false);
 //     }
-//     setActionLoading(false);
 //   };
 
-//   if (!isOpen) {
-//     return <button className="btn btn-secondary px-5 py-2 fs-5" disabled>Đã đóng tuyển</button>;
+//   // Loading state
+//   if (loading) {
+//     return (
+//       <button className="btn btn-outline-secondary px-5 py-2 fs-5" disabled>
+//         Đang tải...
+//       </button>
+//     );
 //   }
 
+//   // Job closed
+//   if (!isOpen) {
+//     return (
+//       <button className="btn btn-secondary px-5 py-2 fs-5" disabled>
+//         Đã đóng tuyển
+//       </button>
+//     );
+//   }
+
+//   // Already applied
+//   if (hasApplied) {
+//     const statusText = applicationStatus === 'PENDING' 
+//       ? 'Đã ứng tuyển' 
+//       : applicationStatus === 'ACCEPTED'
+//       ? 'Đã được chấp nhận'
+//       : applicationStatus === 'REJECTED'
+//       ? 'Đã bị từ chối'
+//       : 'Đã ứng tuyển';
+
+//     return (
+//       <button 
+//         className="btn btn-success px-5 py-2 fs-5" 
+//         disabled
+//       >
+//         {statusText}
+//       </button>
+//     );
+//   }
+
+//   // Can apply
 //   return (
 //     <button
-//       onClick={apply}
-//       disabled={actionLoading || hasApplied}
-//       className={`btn px-5 py-2 fs-5 ${hasApplied ? 'btn-success' : 'btn-danger'}`}
+//       onClick={handleApply}
+//       disabled={actionLoading}
+//       className="btn btn-danger px-5 py-2 fs-5"
 //     >
-//       {actionLoading ? 'Đang xử lý...' : hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
+//       {actionLoading ? 'Đang xử lý...' : 'Ứng tuyển ngay'}
 //     </button>
 //   );
 // }
@@ -83,13 +170,16 @@ const supabase = createClient(
 interface JobApplyButtonProps {
   jobId: string;
   isOpen: boolean;
+  deadline?: string | null; // ✅ ADD deadline prop
 }
 
-export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
+export default function JobApplyButton({ jobId, isOpen, deadline }: JobApplyButtonProps) {
   const [hasApplied, setHasApplied] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [canApply, setCanApply] = useState(false); // ✅ From API
+  const [isPastDeadline, setIsPastDeadline] = useState(false); // ✅ From API
 
   // ✅ CHECK APPLICATION STATUS ON LOAD
   useEffect(() => {
@@ -106,7 +196,6 @@ export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
           return;
         }
 
-        // ✅ THÊM ?check=me để phân biệt với employer list view
         const res = await fetch(`/api/jobs/${jobId}/applications?check=me`, {
           method: 'GET',
           headers: {
@@ -121,9 +210,12 @@ export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
           
           setHasApplied(result.applied === true);
           setApplicationStatus(result.status || null);
+          setCanApply(result.canApply === true); // ✅ Set from API
+          setIsPastDeadline(result.isPastDeadline === true); // ✅ Set from API
         } else {
           console.error('Failed to check application:', res.status);
           setHasApplied(false);
+          setCanApply(false);
         }
       } catch (err) {
         console.error("Check application error:", err);
@@ -136,6 +228,7 @@ export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
     checkApplication();
   }, [jobId]);
 
+  // ✅ APPLY TO JOB
   const handleApply = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     
@@ -163,7 +256,6 @@ export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
         setApplicationStatus('PENDING');
         alert('Ứng tuyển thành công!');
       } else {
-        // Handle "already applied" case
         if (result.applied) {
           setHasApplied(true);
           alert('Bạn đã ứng tuyển công việc này rồi!');
@@ -173,6 +265,47 @@ export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
       }
     } catch (err) {
       console.error('Apply error:', err);
+      alert('Lỗi kết nối server');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ✅ WITHDRAW APPLICATION
+  const handleWithdraw = async () => {
+    // Confirm before withdraw
+    const confirmed = window.confirm('Bạn có chắc muốn hủy ứng tuyển không?');
+    if (!confirmed) return;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      alert('Vui lòng đăng nhập!');
+      return;
+    }
+
+    setActionLoading(true);
+
+    try {
+      const res = await fetch(`/api/jobs/${jobId}/applications`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      const result = await res.json();
+      console.log('Withdraw result:', result);
+
+      if (res.ok) {
+        setHasApplied(false);
+        setApplicationStatus(null);
+        alert('Đã hủy ứng tuyển thành công!');
+      } else {
+        alert(result.error || 'Lỗi khi hủy ứng tuyển');
+      }
+    } catch (err) {
+      console.error('Withdraw error:', err);
       alert('Lỗi kết nối server');
     } finally {
       setActionLoading(false);
@@ -192,28 +325,59 @@ export default function JobApplyButton({ jobId, isOpen }: JobApplyButtonProps) {
   if (!isOpen) {
     return (
       <button className="btn btn-secondary px-5 py-2 fs-5" disabled>
-        Đã đóng tuyển
+        🔒 Đã đóng tuyển
       </button>
     );
   }
 
-  // Already applied
+  // ✅ PAST DEADLINE
+  if (isPastDeadline || (deadline && new Date() > new Date(deadline))) {
+    return (
+      <button className="btn btn-secondary px-5 py-2 fs-5" disabled>
+        Đã hết hạn ứng tuyển
+      </button>
+    );
+  }
+
+  // Already applied - Show status and withdraw button
   if (hasApplied) {
-    const statusText = applicationStatus === 'PENDING' 
-      ? 'Đã ứng tuyển' 
-      : applicationStatus === 'ACCEPTED'
-      ? 'Đã được chấp nhận'
-      : applicationStatus === 'REJECTED'
-      ? 'Đã bị từ chối'
-      : 'Đã ứng tuyển';
+    const getStatusInfo = () => {
+      switch (applicationStatus) {
+        case 'PENDING':
+          return { text: 'Đã ứng tuyển (Đang chờ)', color: 'warning', icon: '' };
+        case 'ACCEPTED':
+          return { text: 'Đã được chấp nhận', color: 'success', icon: '' };
+        case 'REJECTED':
+          return { text: 'Đã bị từ chối', color: 'danger', icon: '' };
+        default:
+          return { text: 'Đã ứng tuyển', color: 'success', icon: '' };
+      }
+    };
+
+    const statusInfo = getStatusInfo();
+    const canWithdraw = applicationStatus === 'PENDING' || !applicationStatus;
 
     return (
-      <button 
-        className="btn btn-success px-5 py-2 fs-5" 
-        disabled
-      >
-        {statusText}
-      </button>
+      <div className="d-flex gap-2 align-items-center">
+        <button 
+          className={`btn btn-${statusInfo.color} px-4 py-2 fs-5`}
+          disabled
+        >
+          {statusInfo.icon} {statusInfo.text}
+        </button>
+        
+        {/* ✅ WITHDRAW BUTTON - Only show if PENDING */}
+        {canWithdraw && (
+          <button
+            onClick={handleWithdraw}
+            disabled={actionLoading}
+            className="btn btn-outline-danger px-4 py-2 fs-5"
+            title="Hủy ứng tuyển"
+          >
+            {actionLoading ? 'Đang xử lý...' : 'Hủy'}
+          </button>
+        )}
+      </div>
     );
   }
 

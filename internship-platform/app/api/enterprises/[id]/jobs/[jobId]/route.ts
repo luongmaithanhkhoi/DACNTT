@@ -92,6 +92,46 @@ export async function GET(
   }
 }
 
+// export async function PUT(
+//   request: NextRequest,
+//   { params }: { params: Promise<{ id: string; jobId: string }> }
+// ) {
+//   const { id: enterpriseId, jobId } = await params;
+
+//   try {
+//     const body = await request.json();
+
+//     const { data, error } = await supabase
+//       .from('JobPosting')
+//       .update({
+//         title: body.title,
+//         description: body.description,
+//         category_id: body.category_id,
+//         job_type: body.job_type,
+//         work_mode: body.work_mode,
+//         location_id: body.location_id,
+//         internship_period: body.internship_period || null,
+//         require_gpa_min: body.require_gpa_min || null,
+//         application_deadline: body.application_deadline || null,
+//         is_open: body.is_open, // Cho phép đóng/mở lại
+//       })
+//       .eq('id', jobId)
+//       .eq('enterprise_id', enterpriseId)
+//       .select()
+//       .single();
+
+//     if (error) throw error;
+
+//     return NextResponse.json({ success: true, data, message: 'Cập nhật công việc thành công' });
+//   } catch (err) {
+//     console.error('Lỗi update job:', err);
+//     return NextResponse.json(
+//       { success: false, error: 'Không thể cập nhật công việc' },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; jobId: string }> }
@@ -101,32 +141,70 @@ export async function PUT(
   try {
     const body = await request.json();
 
-    const { data, error } = await supabase
+    // Tách skills ra khỏi job fields
+    const { skills, ...jobUpdateFields } = body;
+
+    // 1. Cập nhật thông tin chính của JobPosting
+    const { error: updateJobError } = await supabase
       .from('JobPosting')
       .update({
-        title: body.title,
-        description: body.description,
-        category_id: body.category_id,
-        job_type: body.job_type,
-        work_mode: body.work_mode,
-        location_id: body.location_id,
-        internship_period: body.internship_period || null,
-        require_gpa_min: body.require_gpa_min || null,
-        application_deadline: body.application_deadline || null,
-        is_open: body.is_open, // Cho phép đóng/mở lại
+        ...jobUpdateFields,
+        updated_at: new Date().toISOString(), // tự động cập nhật thời gian
       })
       .eq('id', jobId)
-      .eq('enterprise_id', enterpriseId)
-      .select()
-      .single();
+      .eq('enterprise_id', enterpriseId);
 
-    if (error) throw error;
+    if (updateJobError) {
+      console.error('Lỗi cập nhật JobPosting:', updateJobError);
+      return NextResponse.json(
+        { success: false, error: 'Không thể cập nhật thông tin công việc' },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({ success: true, data, message: 'Cập nhật công việc thành công' });
-  } catch (err) {
-    console.error('Lỗi update job:', err);
+    // 2. Xử lý kỹ năng: xóa cũ → thêm mới
+    // Xóa tất cả kỹ năng cũ của job này
+    const { error: deleteSkillsError } = await supabase
+      .from('JobSkill')
+      .delete()
+      .eq('job_id', jobId);
+
+    if (deleteSkillsError) {
+      console.error('Lỗi xóa kỹ năng cũ:', deleteSkillsError);
+      // Không return error – vẫn coi là thành công (kỹ năng sẽ được thêm lại)
+    }
+
+    // Thêm kỹ năng mới (nếu có)
+    if (skills && Array.isArray(skills) && skills.length > 0) {
+      // Lọc chỉ những skill có level > 0
+      const validSkills = skills.filter((s: any) => s.required_level > 0);
+
+      if (validSkills.length > 0) {
+        const inserts = validSkills.map((s: any) => ({
+          job_id: jobId,
+          skill_id: s.skill_id,
+          required_level: s.required_level,
+        }));
+
+        const { error: insertSkillsError } = await supabase
+          .from('JobSkill')
+          .insert(inserts);
+
+        if (insertSkillsError) {
+          console.error('Lỗi thêm kỹ năng mới:', insertSkillsError);
+          // Không return error – vẫn thành công phần chính
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Cập nhật công việc thành công!',
+    });
+  } catch (err: any) {
+    console.error('Lỗi PUT job:', err);
     return NextResponse.json(
-      { success: false, error: 'Không thể cập nhật công việc' },
+      { success: false, error: err.message || 'Không thể cập nhật công việc' },
       { status: 500 }
     );
   }

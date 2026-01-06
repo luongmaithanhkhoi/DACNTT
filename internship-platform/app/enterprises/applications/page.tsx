@@ -1,0 +1,773 @@
+// // app/enterprise/applications/page.tsx
+
+// "use client";
+
+// import { useEffect, useState } from 'react';
+// import Link from 'next/link';
+// import { createClient } from '@supabase/supabase-js';
+
+// const supabase = createClient(
+//   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+//   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// );
+
+// interface Application {
+//   id: string;
+//   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+//   created_at: string;
+//   student: {
+//     id: string;
+//     fullName: string;
+//     major: string;
+//     gpa: number | null;
+//     phone: string;
+//     location: string;
+//     avatarUrl: string;
+//   };
+//   jobTitle: string;
+// }
+
+// export default function EnterpriseApplicationsPage() {
+//   const [applications, setApplications] = useState<Application[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [totalPages, setTotalPages] = useState(1);
+
+//   useEffect(() => {
+//     const fetchApplications = async () => {
+//       const { data: { session } } = await supabase.auth.getSession();
+//       if (!session) {
+//         window.location.href = '/login';
+//         return;
+//       }
+
+//       const res = await fetch(`/api/enterprises/applications?page=${currentPage}`, {
+//         headers: { Authorization: `Bearer ${session.access_token}` },
+//       });
+
+//       if (res.ok) {
+//         const json = await res.json();
+//         setApplications(json.applications || []);
+//         setTotalPages(json.pagination.totalPages);
+//       }
+//       setLoading(false);
+//     };
+
+//     fetchApplications();
+//   }, [currentPage]);
+
+//   const getStatusBadge = (status: string) => {
+//     switch (status) {
+//       case 'PENDING':
+//         return <span className="badge bg-warning text-dark px-3 py-1">Đang chờ</span>;
+//       case 'ACCEPTED':
+//         return <span className="badge bg-success px-3 py-1">Chấp nhận</span>;
+//       case 'REJECTED':
+//         return <span className="badge bg-danger px-3 py-1">Từ chối</span>;
+//       default:
+//         return <span className="badge bg-secondary px-3 py-1">{status}</span>;
+//     }
+//   };
+
+//   const paginate = (page: number) => {
+//     setCurrentPage(page);
+//     window.scrollTo({ top: 0, behavior: 'smooth' });
+//   };
+
+//   if (loading) return <div className="text-center py-20 fs-4">Đang tải hồ sơ ứng tuyển...</div>;
+
+//   return (
+//     <div className="inner-content py-5">
+//       <div className="container">
+//         <h1 className="text-center mb-5 fs-2 fw-bold">Hồ sơ ứng tuyển ({applications.length})</h1>
+
+//         {applications.length === 0 ? (
+//           <div className="text-center py-10">
+//             <p className="text-gray-600 fs-4">Chưa có hồ sơ ứng tuyển nào.</p>
+//             <Link href="/enterprise/post-job" className="btn btn-danger px-6 py-3 fs-4">
+//               Đăng tin tuyển dụng mới
+//             </Link>
+//           </div>
+//         ) : (
+//           <>
+//             <div className="row g-4 mb-5">
+//               {applications.map((app) => (
+//                 <div key={app.id} className="col-md-6 col-lg-4">
+//                   <div className="bg-white rounded shadow p-4 border h-100 d-flex flex-column">
+//                     <div className="d-flex align-items-center mb-3">
+//                       <img
+//                         src={'/images/client.jpg'}
+//                         alt={app.student.fullName}
+//                         className="rounded-circle me-3"
+//                         style={{ width: 60, height: 60, objectFit: 'cover' }}
+//                       />
+//                       <div>
+//                         <h5 className="mb-1">
+//                           <Link href={`/student/${app.student.id}`} className="text-primary">
+//                             {app.student.fullName}
+//                           </Link>
+//                         </h5>
+//                         <p className="text-muted mb-0">{app.student.major}</p>
+//                       </div>
+//                     </div>
+
+//                     <p className="mb-2"><strong>Công việc:</strong> {app.jobTitle}</p>
+//                     <p className="mb-2"><strong>GPA:</strong> {app.student.gpa || 'Chưa cập nhật'}</p>
+//                     <p className="mb-3"><strong>Địa điểm:</strong> {app.student.location}</p>
+
+//                     <div className="mt-auto d-flex justify-content-between align-items-center">
+//                       {getStatusBadge(app.status)}
+//                       <small className="text-muted">
+//                         Nộp: {new Date(app.created_at).toLocaleDateString('vi-VN')}
+//                       </small>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+
+//             {/* PHÂN TRANG */}
+//             {totalPages > 1 && (
+//               <nav className="d-flex justify-content-center">
+//                 <ul className="pagination">
+//                   <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+//                     <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
+//                       Previous
+//                     </button>
+//                   </li>
+//                   {[...Array(totalPages)].map((_, i) => (
+//                     <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+//                       <button className="page-link" onClick={() => paginate(i + 1)}>
+//                         {i + 1}
+//                       </button>
+//                     </li>
+//                   ))}
+//                   <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+//                     <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>
+//                       Next
+//                     </button>
+//                   </li>
+//                 </ul>
+//               </nav>
+//             )}
+//           </>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+
+// app/enterprise/applications/page.tsx
+
+// "use client";
+
+// import { useEffect, useState } from 'react';
+// import Link from 'next/link';
+// import { createClient } from '@supabase/supabase-js';
+
+// const supabase = createClient(
+//   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+//   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// );
+
+// interface Job {
+//   id: string;
+//   title: string;
+// }
+
+// interface Application {
+//   id: string;
+//   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+//   created_at: string;
+//   student: {
+//     id: string;
+//     fullName: string;
+//     major: string;
+//     gpa: number | null;
+//     phone: string;
+//     location: string;
+//     avatarUrl: string;
+//     cv_url?: string; // URL CV PDF
+//   };
+//   jobTitle: string;
+//   jobId: string;
+// }
+
+// export default function EnterpriseApplicationsPage() {
+//   const [applications, setApplications] = useState<Application[]>([]);
+//   const [allJobs, setAllJobs] = useState<Job[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [totalPages, setTotalPages] = useState(1);
+
+//   // Lọc
+//   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED'>('ALL');
+//   const [jobFilter, setJobFilter] = useState<string>('ALL');
+
+//   // Modal CV
+//   const [selectedCV, setSelectedCV] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       const { data: { session } } = await supabase.auth.getSession();
+//       if (!session) {
+//         window.location.href = '/login';
+//         return;
+//       }
+
+//       // Lấy danh sách job của doanh nghiệp (để filter)
+//       const jobRes = await fetch('/api/enterprises/jobs', {
+//         headers: { Authorization: `Bearer ${session.access_token}` },
+//       });
+
+//       if (jobRes.ok) {
+//         const jobJson = await jobRes.json();
+//         setAllJobs(jobJson.jobs || []);
+//       }
+
+//       // Lấy applications
+//       const query = new URLSearchParams({
+//         page: currentPage.toString(),
+//       });
+//       if (statusFilter !== 'ALL') query.append('status', statusFilter);
+//       if (jobFilter !== 'ALL') query.append('job_id', jobFilter);
+
+//       const res = await fetch(`/api/enterprises/applications?${query}`, {
+//         headers: { Authorization: `Bearer ${session.access_token}` },
+//       });
+
+//       if (res.ok) {
+//         const json = await res.json();
+//         setApplications(json.applications || []);
+//         setTotalPages(json.pagination.totalPages);
+//       }
+//       setLoading(false);
+//     };
+
+//     fetchData();
+//   }, [currentPage, statusFilter, jobFilter]);
+
+//   // Xử lý chấp nhận/từ chối
+//   const updateStatus = async (appId: string, newStatus: 'ACCEPTED' | 'REJECTED') => {
+//     const { data: { session } } = await supabase.auth.getSession();
+//     if (!session) return;
+
+//     const res = await fetch(`/api/enterprises/applications/${appId}`, {
+//       method: 'PATCH',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${session.access_token}`,
+//       },
+//       body: JSON.stringify({ status: newStatus }),
+//     });
+
+//     if (res.ok) {
+//       setApplications(prev => prev.map(app => 
+//         app.id === appId ? { ...app, status: newStatus } : app
+//       ));
+//     }
+//   };
+
+//   const getStatusBadge = (status: string) => {
+//     switch (status) {
+//       case 'PENDING': return <span className="badge bg-warning text-dark px-3 py-1">Đang chờ</span>;
+//       case 'ACCEPTED': return <span className="badge bg-success px-3 py-1">Chấp nhận</span>;
+//       case 'REJECTED': return <span className="badge bg-danger px-3 py-1">Từ chối</span>;
+//       default: return <span className="badge bg-secondary px-3 py-1">{status}</span>;
+//     }
+//   };
+
+//   if (loading) return <div className="text-center py-20 fs-4">Đang tải...</div>;
+
+//   return (
+//     <div className="inner-content py-5">
+//       <div className="container">
+//         <h1 className="text-center mb-5 fs-2 fw-bold">Hồ sơ ứng tuyển</h1>
+
+//         {/* LỌC */}
+//         <div className="row mb-4 g-3">
+//           <div className="col-md-6">
+//             <select className="form-control" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)}>
+//               <option value="ALL">Tất cả trạng thái</option>
+//               <option value="PENDING">Đang chờ</option>
+//               <option value="ACCEPTED">Chấp nhận</option>
+//               <option value="REJECTED">Từ chối</option>
+//             </select>
+//           </div>
+//           <div className="col-md-6">
+//             <select className="form-control" value={jobFilter} onChange={(e) => setJobFilter(e.target.value)}>
+//               <option value="ALL">Tất cả công việc</option>
+//               {allJobs.map(job => (
+//                 <option key={job.id} value={job.id}>{job.title}</option>
+//               ))}
+//             </select>
+//           </div>
+//         </div>
+
+//         {applications.length === 0 ? (
+//           <div className="text-center py-10">
+//             <p className="fs-4 text-gray-600">Không có hồ sơ ứng tuyển nào theo bộ lọc hiện tại.</p>
+//           </div>
+//         ) : (
+//           <>
+//             <div className="row g-4 mb-5">
+//               {applications.map((app) => (
+//                 <div key={app.id} className="col-md-6 col-lg-4">
+//                   <div className="bg-white rounded shadow p-4 h-100 d-flex flex-column">
+//                     <div className="d-flex align-items-center mb-3">
+//                       <img src={app.student.avatarUrl} alt={app.student.fullName} className="rounded-circle me-3" style={{ width: 60, height: 60, objectFit: 'cover' }} />
+//                       <div>
+//                         <h5><Link href={`/student/${app.student.id}`} className="text-primary">{app.student.fullName}</Link></h5>
+//                         <p className="text-muted mb-0">{app.student.major}</p>
+//                       </div>
+//                     </div>
+
+//                     <p><strong>Công việc:</strong> {app.jobTitle}</p>
+//                     <p><strong>GPA:</strong> {app.student.gpa || 'Chưa cập nhật'}</p>
+//                     <p><strong>Điện thoại:</strong> {app.student.phone}</p>
+
+//                     <div className="mt-auto">
+//                       <div className="d-flex justify-content-between align-items-center mb-3">
+//                         {getStatusBadge(app.status)}
+//                         <small className="text-muted">
+//                           Nộp: {new Date(app.created_at).toLocaleDateString('vi-VN')}
+//                         </small>
+//                       </div>
+
+//                       {/* NÚT CHẤP NHẬN / TỪ CHỐI (chỉ khi PENDING) */}
+//                       {app.status === 'PENDING' && (
+//                         <div className="d-flex gap-2">
+//                           <button
+//                             onClick={() => updateStatus(app.id, 'ACCEPTED')}
+//                             className="btn btn-success flex-fill"
+//                           >
+//                             Chấp nhận
+//                           </button>
+//                           <button
+//                             onClick={() => updateStatus(app.id, 'REJECTED')}
+//                             className="btn btn-danger flex-fill"
+//                           >
+//                             Từ chối
+//                           </button>
+//                         </div>
+//                       )}
+
+//                       {/* NÚT XEM CV */}
+//                       {/* {app.student.cv_url && (
+//                         <button
+//                           onClick={() => setSelectedCV(app.student.cv_url)}
+//                           className="btn btn-outline-primary w-100 mt-2"
+//                         >
+//                           Xem CV
+//                         </button>
+//                       )} */}
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+
+//             {/* PHÂN TRANG */}
+//             {totalPages > 1 && (
+//               <nav className="d-flex justify-content-center">
+//                 <ul className="pagination">
+//                   <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+//                     <button className="page-link" onClick={() => setCurrentPage(prev => prev - 1)} disabled={currentPage === 1}>
+//                       Previous
+//                     </button>
+//                   </li>
+//                   {[...Array(totalPages)].map((_, i) => (
+//                     <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+//                       <button className="page-link" onClick={() => setCurrentPage(i + 1)}>
+//                         {i + 1}
+//                       </button>
+//                     </li>
+//                   ))}
+//                   <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+//                     <button className="page-link" onClick={() => setCurrentPage(prev => prev + 1)} disabled={currentPage === totalPages}>
+//                       Next
+//                     </button>
+//                   </li>
+//                 </ul>
+//               </nav>
+//             )}
+//           </>
+//         )}
+
+//         {/* MODAL XEM CV */}
+//         {selectedCV && (
+//           <div className="modal d-block bg-black bg-opacity-50" style={{ position: 'fixed', inset: 0, zIndex: 1050 }}>
+//             <div className="modal-dialog modal-xl modal-dialog-centered">
+//               <div className="modal-content">
+//                 <div className="modal-header">
+//                   <h5 className="modal-title">CV của ứng viên</h5>
+//                   <button type="button" className="btn-close" onClick={() => setSelectedCV(null)}></button>
+//                 </div>
+//                 <div className="modal-body p-0">
+//                   <iframe src={selectedCV} width="100%" height="600px" style={{ border: 'none' }} />
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+"use client";
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+interface Job {
+  id: string;
+  title: string;
+}
+
+interface Application {
+  id: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  appliedAt: string;
+  jobId: string;
+  jobTitle: string;
+  student: {
+    id: string;
+    fullName: string;
+    major: string;
+    gpa: number | null;
+    phone: string;
+    location: string;
+    avatarUrl: string;
+    cv_url?: string;
+  };
+}
+
+export default function EnterpriseApplicationsPage() {
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [allJobs, setAllJobs] = useState<Job[]>([]); // Để hiển thị tên job nếu cần sau
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  // Lấy enterprise_id từ localStorage
+  const [currentEnterpriseId, setCurrentEnterpriseId] = useState<string | null>(null);
+
+  // Lọc theo trạng thái
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED'>('ALL');
+
+  // Modal xem CV
+  const [selectedCV, setSelectedCV] = useState<string | null>(null);
+
+  // Loading khi cập nhật trạng thái
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Lấy enterprise_id từ localStorage khi mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const enterpriseId = localStorage.getItem('enterprise_id');
+      if (!enterpriseId) {
+        alert('Không tìm thấy thông tin doanh nghiệp. Vui lòng đăng nhập lại.');
+        window.location.href = '/login';
+        return;
+      }
+      setCurrentEnterpriseId(enterpriseId);
+    }
+  }, []);
+
+  // Lấy danh sách jobs (chỉ để debug hoặc mở rộng sau, không bắt buộc cho filter status)
+  useEffect(() => {
+    if (!currentEnterpriseId) return;
+
+    const fetchJobs = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch(`/api/enterprises/${currentEnterpriseId}/jobs`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setAllJobs(json.data);
+        }
+      }
+    };
+
+    fetchJobs();
+  }, [currentEnterpriseId]);
+
+  // Lấy danh sách applications
+  useEffect(() => {
+    if (!currentEnterpriseId) return;
+
+    const fetchApplications = async () => {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login';
+        return;
+      }
+
+      const query = new URLSearchParams({
+        page: currentPage.toString(),
+      });
+      if (statusFilter !== 'ALL') {
+        query.append('status', statusFilter);
+      }
+
+      const res = await fetch(`/api/enterprises/applications?${query}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setApplications(json.applications || []);
+          setTotalPages(json.pagination.totalPages);
+          setTotalItems(json.pagination.totalItems);
+        }
+      } else {
+        alert('Lỗi khi tải hồ sơ ứng tuyển');
+      }
+      setLoading(false);
+    };
+
+    fetchApplications();
+  }, [currentPage, statusFilter, currentEnterpriseId]);
+
+  // Cập nhật trạng thái ứng tuyển
+  const updateStatus = async (appId: string, newStatus: 'ACCEPTED' | 'REJECTED') => {
+    if (!confirm(`Bạn có chắc muốn ${newStatus === 'ACCEPTED' ? 'CHẤP NHẬN' : 'TỪ CHỐI'} ứng viên này?`)) {
+      return;
+    }
+
+    setUpdatingId(appId);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const res = await fetch(`/api/enterprises/applications/${appId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
+    if (res.ok) {
+      const result = await res.json();
+      if (result.success) {
+        setApplications(prev =>
+          prev.map(app => (app.id === appId ? { ...app, status: newStatus } : app))
+        );
+        alert(result.message || 'Cập nhật thành công!');
+      }
+    } else {
+      alert('Không thể cập nhật trạng thái');
+    }
+    setUpdatingId(null);
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return <span className="badge bg-warning text-dark px-3 py-1">Đang chờ</span>;
+      case 'ACCEPTED':
+        return <span className="badge bg-success px-3 py-1">Chấp nhận</span>;
+      case 'REJECTED':
+        return <span className="badge bg-danger px-3 py-1">Từ chối</span>;
+      default:
+        return <span className="badge bg-secondary px-3 py-1">{status}</span>;
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (!currentEnterpriseId) {
+    return <div className="text-center py-20">Đang tải thông tin doanh nghiệp...</div>;
+  }
+
+  if (loading) {
+    return <div className="text-center py-20 fs-4">Đang tải hồ sơ ứng tuyển...</div>;
+  }
+
+  return (
+    <div className="inner-content py-5">
+      <div className="container">
+        <h1 className="text-center mb-5 fs-2 fw-bold">
+          Hồ sơ ứng tuyển ({totalItems})
+        </h1>
+
+        {/* Bộ lọc trạng thái */}
+        <div className="row mb-4">
+          <div className="col-md-4">
+            <select
+              className="form-control"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as any);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="ALL">Tất cả trạng thái</option>
+              <option value="PENDING">Đang chờ</option>
+              <option value="ACCEPTED">Đã chấp nhận</option>
+              <option value="REJECTED">Đã từ chối</option>
+            </select>
+          </div>
+        </div>
+
+        {applications.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="fs-4 text-gray-600">
+              {statusFilter === 'ALL'
+                ? 'Chưa có hồ sơ ứng tuyển nào.'
+                : `Không có hồ sơ nào ở trạng thái "${statusFilter === 'PENDING' ? 'Đang chờ' : statusFilter === 'ACCEPTED' ? 'Chấp nhận' : 'Từ chối'}".`}
+            </p>
+            <Link href="/enterprise/post-job" className="btn btn-danger px-6 py-3 fs-5">
+              Đăng tin tuyển dụng mới
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="row g-4 mb-5">
+              {applications.map((app) => (
+                <div key={app.id} className="col-md-6 col-lg-4">
+                  <div className="bg-white rounded shadow p-4 h-100 d-flex flex-column">
+                    <div className="d-flex align-items-center mb-3">
+                      <img
+                        src={app.student.avatarUrl}
+                        alt={app.student.fullName}
+                        className="rounded-circle me-3"
+                        style={{ width: 60, height: 60, objectFit: 'cover' }}
+                      />
+                      <div>
+                        <h5>
+                          <Link href={`/student/${app.student.id}`} className="text-primary text-decoration-none">
+                            {app.student.fullName}
+                          </Link>
+                        </h5>
+                        <p className="text-muted mb-0">{app.student.major || 'Chưa cập nhật'}</p>
+                      </div>
+                    </div>
+
+                    <p className="mb-2"><strong>Công việc:</strong> {app.jobTitle}</p>
+                    <p className="mb-2"><strong>GPA:</strong> {app.student.gpa || 'Chưa cập nhật'}</p>
+                    <p className="mb-2"><strong>Điện thoại:</strong> {app.student.phone}</p>
+                    <p className="mb-3"><strong>Địa điểm:</strong> {app.student.location}</p>
+
+                    <div className="mt-auto">
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        {getStatusBadge(app.status)}
+                        <small className="text-muted">
+                          Nộp: {new Date(app.appliedAt).toLocaleDateString('vi-VN')}
+                        </small>
+                      </div>
+
+                      {/* Nút xử lý khi đang chờ */}
+                      {app.status === 'PENDING' && (
+                        <div className="d-flex gap-2 mb-2">
+                          <button
+                            onClick={() => updateStatus(app.id, 'ACCEPTED')}
+                            disabled={updatingId === app.id}
+                            className="btn btn-success flex-fill"
+                          >
+                            {updatingId === app.id ? 'Đang xử lý...' : 'Chấp nhận'}
+                          </button>
+                          <button
+                            onClick={() => updateStatus(app.id, 'REJECTED')}
+                            disabled={updatingId === app.id}
+                            className="btn btn-danger flex-fill"
+                          >
+                            {updatingId === app.id ? 'Đang xử lý...' : 'Từ chối'}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Xem CV */}
+                      {app.student.cv_url && (
+                        <button
+                          onClick={() => setSelectedCV(app.student.cv_url!)}
+                          className="btn btn-outline-primary w-100"
+                        >
+                          Xem CV
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Phân trang */}
+            {totalPages > 1 && (
+              <nav className="d-flex justify-content-center">
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                  </li>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => handlePageChange(i + 1)}>
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
+          </>
+        )}
+
+        {/* Modal xem CV */}
+        {selectedCV && (
+          <div
+            className="modal d-block bg-black bg-opacity-50"
+            style={{ position: 'fixed', inset: 0, zIndex: 1050 }}
+            onClick={() => setSelectedCV(null)}
+          >
+            <div className="modal-dialog modal-xl modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">CV của ứng viên</h5>
+                  <button type="button" className="btn-close" onClick={() => setSelectedCV(null)}></button>
+                </div>
+                <div className="modal-body p-0">
+                  <iframe src={selectedCV} width="100%" height="700px" style={{ border: 'none' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
