@@ -17,11 +17,10 @@ export default function Footer() {
                 </div>
               </div>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Suspendisse consectetur quis risus sit amet aliquam.
+                 Địa chỉ: Phòng C004, Số 19 Nguyễn Hữu Thọ, phường Tân Hưng, TP. Hồ Chi Minh
               </p>
               <div className="read-btn">
-                <a href="#">Read More</a>
+               <p>Điện thoại: (028) 37755046</p>
               </div>
             </div>
 
@@ -31,46 +30,38 @@ export default function Footer() {
                   <h3>Quick Links</h3>
                   <ul className="footer-links">
                     <li>
-                      <a href="/about-us">About Us</a>
+                      <a href="/about-us">Giới thiệu</a>
                     </li>
                     <li>
-                      <a href="/blog">Blog</a>
+                      <a href="/blog">Giáo dục</a>
                     </li>
                     <li>
-                      <a href="/register">Register</a>
+                      <a href="/register">Hợp tác</a>
                     </li>
                     <li>
-                      <a href="/contact-us">Contact Us</a>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="col-lg-4 col-md-4">
-                  <h3>Jobs</h3>
-                  <ul className="footer-links">
-                    <li>
-                      <a href="#">New York</a>
-                    </li>
-                    <li>
-                      <a href="#">London</a>
-                    </li>
-                    <li>
-                      <a href="#">Washington</a>
+                      <a href="/contact-us">Tuyển sinh</a>
                     </li>
                   </ul>
                 </div>
 
+
+
+
+
                 <div className="col-lg-4 col-md-4">
-                  <h3>Categories</h3>
+                  <h3>Khoa công nghệ thông tin</h3>
                   <ul className="footer-links">
                     <li>
-                      <a href="#">IT Jobs</a>
+                      <a href="#">Tin tức - sự kiện</a>
                     </li>
                     <li>
-                      <a href="#">Education</a>
+                      <a href="#">Cơ hội việc làm</a>
                     </li>
                     <li>
-                      <a href="#">Engineering</a>
+                      <a href="#">Câu lạc bộ ICON</a>
+                    </li>
+                    <li>
+                      <a href="#">Tập Sự Nghề Nghiệp</a>
                     </li>
                   </ul>
                 </div>

@@ -1,77 +1,4 @@
-// "use client";
 
-// import { useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import { supabase } from '@/lib/supabaseClient';
-
-// export function useLogin() {
-//   const router = useRouter();
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState<string | null>(null);
-
-//   const submit = async (email: string, password: string) => {
-//     setLoading(true);
-//     setError(null);
-
-//     try {
-//       if (!email || !password) {
-//         throw new Error('Vui lòng nhập email và mật khẩu');
-//       }
-
-//       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-//         email: email.trim().toLowerCase(),
-//         password,
-//       });
-
-//       if (authError) throw authError;
-//       if (!authData.session || !authData.user) {
-//         throw new Error('Đăng nhập thất bại');
-//       }
-
-//       // Lấy user từ Supabase auth
-//       const { data: { user } } = await supabase.auth.getUser();
-//       console.log("AUTH UID:", user?.id);
-//       if (!user) throw new Error('Không thể lấy thông tin user');
-
-//       // Lấy app user từ bảng User
-
-//           const { data: appUser, error: roleError } = await supabase
-//           .from('User')
-//           .select('role')
-//           .eq('provider_uid', user.id)
-//           .single();
-//           console.log("app:", appUser);
-//         if (roleError || !appUser) {
-//           setError('Không tìm thấy thông tin tài khoản');
-//           return;
-//         }
-
-//         // Redirect theo role thật
-//         if (appUser.role === 'STUDENT') {
-//           router.push('/profile');
-//         } else if (appUser.role === 'ENTERPRISE') {
-//           router.push('/enterprises/dashboard'); 
-//         } else {
-//           router.push('/'); 
-//         }
-
-//         router.refresh();
-//           } catch (err) {
-//             const msg = err instanceof Error ? err.message : 'Đăng nhập thất bại';
-//             if (msg.includes('Invalid login credentials')) {
-//               setError('Email hoặc mật khẩu không đúng');
-//             } else if (msg.includes('Email not confirmed')) {
-//               setError('Email chưa được xác thực');
-//             } else {
-//               setError(msg);
-//             }
-//           } finally {
-//             setLoading(false);
-//           }
-//         };
-
-//   return { submit, loading, error };
-// }
 
 "use client";
 
@@ -132,7 +59,7 @@ export function useLogin() {
           .from('EnterpriseUser')
           .select('enterprise_id')
           .eq('user_id', appUser.id)
-          .single();
+          .maybeSingle()
 
         if (entError || !entLink) {
           console.error('Không tìm thấy liên kết enterprise:', entError);

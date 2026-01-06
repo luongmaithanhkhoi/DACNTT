@@ -2,6 +2,7 @@ import Link from "next/link";
 import Head from "next/head";
 import NavbarLinks from "./NavbarLinks";
 import LogoutButton from '@/components/LogoutButton';
+import PostJobButton from '@/components/PostJobButton';
 export default function Header() {
   return (
     <>
@@ -107,7 +108,8 @@ export default function Header() {
             <div className="col-lg-4 col-md-12">
               <div className="header-right">
                 <div className="post-btn">
-                  <a href="/post-job">Post a Job</a>
+                  {/* <a href="/post-job">Post a Job</a> */}
+                  <PostJobButton />
                 </div>
                 <div className="user-wrap">
                   <div className="register-btn">
