@@ -72,7 +72,7 @@ export default function NavbarLinks() {
       setRole(savedRole);
 
       if (savedRole === 'ENTERPRISE') {
-        setProfileHref('/enterprise/dashboard'); // sửa thành đúng path
+        setProfileHref('/enterprises/dashboard'); // sửa thành đúng path
       } else if (savedRole === 'STUDENT') {
         setProfileHref('/profile');
       } else if (savedRole === 'ADMIN') {
