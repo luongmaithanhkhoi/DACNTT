@@ -233,48 +233,114 @@ export async function GET(req: Request) {
 }
 
 // ====== PATCH /api/students/me ======
+// export async function PATCH(req: Request) {
+//   try {
+//     const token = getBearer(req)
+//     if (!token) {
+//       return NextResponse.json({ error: 'Missing Authorization: Bearer <token>' }, { status: 401 })
+//     }
+
+//     const ctx = await getStudentUser(token)
+//     if ('error' in ctx) {
+//       const map = { 'Invalid token': 401, 'App user not found': 404, 'Forbidden: role is not STUDENT': 403, 'Account is inactive': 403 }
+//       return NextResponse.json({ error: ctx.error }, { status: map[ctx.error] ?? 401 })
+//     }
+//     const { appUser } = ctx
+
+//     // Parse & validate body
+//     const raw: PatchBody = await req.json().catch(() => ({}))
+//     const update: Record<string, unknown> = {}
+//     for (const [k, v] of Object.entries(raw ?? {})) {
+//       if (!ALLOWED_FIELDS.has(k) || v === undefined) continue
+//       if (k === 'languages' && v && !Array.isArray(v)) continue
+//       if (k === 'gpa' && v !== null && v !== undefined) {
+//         const num = Number(v)
+//         if (!Number.isNaN(num)) update[k] = num
+//         continue
+//       }
+//       update[k] = v
+//     }
+//     if (Object.keys(update).length === 0) {
+//       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
+//     }
+
+//     const { data: row, error: updErr } = await adminSb
+//       .from('Student')
+//       .update(update)
+//       .eq('user_id', appUser.id)
+//       .select('*')
+//       .single()
+//     if (updErr) return NextResponse.json({ error: updErr.message }, { status: 400 })
+
+//     return NextResponse.json({ ok: true, student: row })
+//   } catch (e) {
+//     console.error('PATCH /students/me error', e)
+//     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+//   }
+// }
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // ← Dùng service key → bypass RLS
+);
+
+async function getAppUserId(token: string): Promise<string | null> {
+  const authClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+  });
+
+  const { data: { user } } = await authClient.auth.getUser();
+  if (!user) return null;
+
+  const { data } = await supabaseAdmin
+    .from('User')
+    .select('id')
+    .eq('provider_uid', user.id)
+    .single();
+
+  return data?.id || null;
+}
+
 export async function PATCH(req: Request) {
   try {
-    const token = getBearer(req)
-    if (!token) {
-      return NextResponse.json({ error: 'Missing Authorization: Bearer <token>' }, { status: 401 })
-    }
+    const token = req.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const ctx = await getStudentUser(token)
-    if ('error' in ctx) {
-      const map = { 'Invalid token': 401, 'App user not found': 404, 'Forbidden: role is not STUDENT': 403, 'Account is inactive': 403 }
-      return NextResponse.json({ error: ctx.error }, { status: map[ctx.error] ?? 401 })
-    }
-    const { appUser, adminSb } = ctx
+    const userId = await getAppUserId(token);
+    if (!userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    // Parse & validate body
-    const raw: PatchBody = await req.json().catch(() => ({}))
-    const update: Record<string, unknown> = {}
-    for (const [k, v] of Object.entries(raw ?? {})) {
-      if (!ALLOWED_FIELDS.has(k) || v === undefined) continue
-      if (k === 'languages' && v && !Array.isArray(v)) continue
-      if (k === 'gpa' && v !== null && v !== undefined) {
-        const num = Number(v)
-        if (!Number.isNaN(num)) update[k] = num
-        continue
-      }
-      update[k] = v
-    }
-    if (Object.keys(update).length === 0) {
-      return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
-    }
+    const body = await req.json();
 
-    const { data: row, error: updErr } = await adminSb
+    // Update Student
+    const { error: studentError } = await supabaseAdmin
       .from('Student')
-      .update(update)
-      .eq('user_id', appUser.id)
-      .select('*')
-      .single()
-    if (updErr) return NextResponse.json({ error: updErr.message }, { status: 400 })
+      .update({
+        full_name: body.full_name || null,
+        major: body.major || null,
+        gpa: body.gpa ? parseFloat(body.gpa) : null,
+        summary: body.summary || null,
+        phone: body.phone || null,
+        location: body.location || null,
+        portfolio_url: body.portfolio_url || null,
+        cv_url: body.cv_url || null,
+      })
+      .eq('user_id', userId);
 
-    return NextResponse.json({ ok: true, student: row })
-  } catch (e) {
-    console.error('PATCH /students/me error', e)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    if (studentError) throw studentError;
+
+    // Update avatar_url trong User nếu có
+    if (body.avatar_url) {
+      const { error: userError } = await supabaseAdmin
+        .from('User')
+        .update({ avatar_url: body.avatar_url })
+        .eq('id', userId);
+
+      if (userError) throw userError;
+    }
+
+    return NextResponse.json({ success: true, message: 'Cập nhật thành công!' });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || 'Lỗi server' }, { status: 500 });
   }
 }
+

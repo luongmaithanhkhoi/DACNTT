@@ -91,3 +91,72 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+async function getEnterpriseId(token: string): Promise<string | null> {
+  const authClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+  });
+
+  const { data: { user } } = await authClient.auth.getUser();
+  if (!user) return null;
+
+  const { data: appUser } = await supabaseAdmin
+    .from('User')
+    .select('id')
+    .eq('provider_uid', user.id)
+    .single();
+
+  if (!appUser) return null;
+
+  const { data: link } = await supabaseAdmin
+    .from('EnterpriseUser')
+    .select('enterprise_id')
+    .eq('user_id', appUser.id)
+    .single();
+
+  return link?.enterprise_id || null;
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const token = req.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const enterpriseId = await getEnterpriseId(token);
+    if (!enterpriseId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    const body = await req.json();
+
+    const updateData: any = {
+      name: body.name?.trim() || null,
+      description: body.description?.trim() || null,
+      industry: body.industry?.trim() || null,
+      website: body.website?.trim() || null,
+      contact_email: body.contact_email?.trim() || null,
+      location: body.location?.trim() || null,
+      address: body.address?.trim() || null,
+      image_url: body.image_url?.trim() || '/images/client.jpg',
+    };
+
+    if (body.image_url) {
+      updateData.image_url = body.image_url;
+    }
+
+    const { error } = await supabaseAdmin
+      .from('Enterprise')
+      .update(updateData)
+      .eq('id', enterpriseId);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true, message: 'Cập nhật thông tin doanh nghiệp thành công!' });
+  } catch (err: any) {
+    console.error('Update enterprise profile error:', err);
+    return NextResponse.json({ error: err.message || 'Lỗi server' }, { status: 500 });
+  }
+}

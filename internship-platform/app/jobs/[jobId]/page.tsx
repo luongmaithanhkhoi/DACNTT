@@ -108,12 +108,6 @@ export default async function StudentJobDetailPage({
 
                 <div className="d-flex gap-3">
                   <JobApplyButton jobId={job.id} isOpen={job.is_open} />
-                  {/* <button className="btn btn-danger px-5 py-2 fs-5" disabled={!job.is_open}>
-                    {job.is_open ? 'Ứng tuyển ngay' : 'Đã đóng tuyển'}
-                  </button> */}
-                  {/* <button className="btn btn-outline-secondary px-5 py-2 fs-5">
-                    ❤️ Lưu tin
-                  </button> */}
                   <JobBookmarkButton jobId={job.id} />
                 </div>
               </div>

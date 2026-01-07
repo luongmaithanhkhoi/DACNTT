@@ -83,21 +83,6 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Job not found' }, { status: 404 });
     }
 
-    // // Format response cho frontend
-    // const job = {
-    //   ...data,
-    //   enterprise: data.enterprise,
-    //   locationName: data.location?.name || null,
-    //   skills: data.job_skills?.map((js: any) => ({
-    //     name: js.skill.name,
-    //     required_level: js.required_level,
-    //   })) || [],
-    // };
-
-    // delete (job as any).enterprise;
-    // delete (job as any).location;
-    // delete (job as any).job_skills;
-
     return NextResponse.json({ success: true, data });
   } catch (err) {
     console.error("Server error:", err);

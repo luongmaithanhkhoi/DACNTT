@@ -111,7 +111,7 @@ export default function EventList({
         params.set("offset", String(offset));
         params.set("order_by", "start_date");
         params.set("order_dir", "desc");
-        if (onlyPublished) params.set("status", "PUBLISHED");
+        if (onlyPublished) params.set("status", "APPROVED");
 
         if (q) params.set("q", q);
         if (categoryId) params.set("category_id", categoryId);
