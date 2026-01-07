@@ -223,7 +223,7 @@ export default function ProfilePage() {
                 <div className="col-md-4">
                   <Link href="/faculty/jobs" className="btn btn-outline-primary w-100 py-4 fs-4">
                     <i className="fa fa-briefcase fa-2x mb-3 d-block" />
-                    Duyệt bài đăng tuyển dụng
+                    Quản Lý Bài Đăng
                   </Link>
                 </div>
                 <div className="col-md-4">
