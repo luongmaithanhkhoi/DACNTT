@@ -14,7 +14,10 @@ function getBearer(req: Request) {
   const [t, token] = h.split(' ')
   return t?.toLowerCase() === 'bearer' ? token : null
 }
-
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 export async function PUT(req: Request) {
   try {
     // 1) Lấy & verify token
@@ -85,5 +88,79 @@ export async function PUT(req: Request) {
   } catch (e: any) {
     console.error('PUT /students/me/skills error', e)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}
+async function getAppUserId(token: string): Promise<string | null> {
+  const authClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+  });
+
+  const { data: { user } } = await authClient.auth.getUser();
+  if (!user) return null;
+
+  const { data } = await supabaseAdmin
+    .from('User')
+    .select('id')
+    .eq('provider_uid', user.id)
+    .single();
+
+  return data?.id || null;
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const token = req.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const studentId = await getAppUserId(token);
+    if (!studentId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    const body = await req.json();
+    const { skills } = body; // mảng [{ skill_id: string, level: number }]
+
+    if (!Array.isArray(skills)) {
+      return NextResponse.json({ error: 'Skills phải là mảng' }, { status: 400 });
+    }
+
+    // Xóa tất cả kỹ năng cũ
+    const { error: deleteError } = await supabaseAdmin
+      .from('StudentSkill')
+      .delete()
+      .eq('student_id', studentId);
+
+    if (deleteError) {
+      console.error('Delete skills error:', deleteError);
+      throw deleteError;
+    }
+
+    // Thêm kỹ năng mới (chỉ level > 0)
+    if (skills.length > 0) {
+      const validSkills = skills.filter((s: any) => s.level > 0 && s.skill_id);
+
+      if (validSkills.length > 0) {
+        const inserts = validSkills.map((s: any) => ({
+          student_id: studentId,
+          skill_id: s.skill_id,
+          level: s.level,
+        }));
+
+        const { error: insertError } = await supabaseAdmin
+          .from('StudentSkill')
+          .insert(inserts);
+
+        if (insertError) {
+          console.error('Insert skills error:', insertError);
+          throw insertError;
+        }
+      }
+    }
+
+    return NextResponse.json({ success: true, message: 'Cập nhật kỹ năng thành công!' });
+  } catch (err: any) {
+    console.error('PATCH skills error:', err);
+    return NextResponse.json(
+      { error: err.message || 'Lỗi server khi cập nhật kỹ năng' },
+      { status: 500 }
+    );
   }
 }

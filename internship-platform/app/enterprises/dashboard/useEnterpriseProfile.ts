@@ -1,4 +1,7 @@
 'use client'
+"use client";
+
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -38,6 +41,7 @@ export function useEnterpriseProfile() {
 
     useEffect(() => {
         fetchProfile();
+        
     }, []);
 
     const fetchProfile = async () => {
@@ -74,6 +78,7 @@ export function useEnterpriseProfile() {
             setLoading(false);
         }
     };
+    
 
     return { data, loading, error };
 }

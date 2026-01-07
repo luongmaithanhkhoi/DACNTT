@@ -2,7 +2,6 @@
 
 'use client'
 
-
 import Link from 'next/link';
 import { useEnterpriseProfile } from './useEnterpriseProfile';
 
@@ -66,7 +65,7 @@ export default function EnterpriseProfilePage() {
                 )}
               </div>
 
-              <Link href="/enterprise/edit-profile" className="btn btn-danger mt-4 px-6 py-3 fs-4">
+              <Link href="/enterprises/edit-profile" className="btn btn-danger mt-4 px-6 py-3 fs-4">
                 Chỉnh sửa thông tin doanh nghiệp
               </Link>
             </div>

@@ -1,7 +1,3 @@
-
-
-// app/student/applications/page.tsx
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -24,7 +20,7 @@ interface AppliedJob {
   jobType?: string;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
   created_at: string;
-  applicationDeadline?: string; // ← THÊM ĐỂ TÍNH NGÀY CÒN LẠI
+  applicationDeadline?: string;
   isExpired: boolean;
 }
 
@@ -35,7 +31,7 @@ export default function AppliedJobsPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState<'all' | 'active' | 'expired'>('all');
-  const [withdrawing, setWithdrawing] = useState<string | null>(null); // jobId đang rút
+  const [withdrawing, setWithdrawing] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAppliedJobs = async () => {
@@ -88,6 +84,8 @@ export default function AppliedJobsPage() {
 
   // Rút hồ sơ
   const withdrawApplication = async (jobId: string) => {
+    if (!confirm('Bạn có chắc chắn muốn rút hồ sơ ứng tuyển này?')) return;
+
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       alert('Vui lòng đăng nhập lại!');
@@ -105,7 +103,6 @@ export default function AppliedJobsPage() {
       });
 
       if (res.ok) {
-        // Cập nhật local state: xóa job khỏi list
         setAllJobs(prev => prev.filter(j => j.id !== jobId));
         alert('Rút hồ sơ thành công!');
       } else {
@@ -130,6 +127,11 @@ export default function AppliedJobsPage() {
       default:
         return <span className="badge bg-secondary px-3 py-1 rounded">{status}</span>;
     }
+  };
+
+  // Điều kiện hiển thị nút "Rút hồ sơ"
+  const canWithdraw = (job: AppliedJob) => {
+    return !job.isExpired && job.status !== 'REJECTED';
   };
 
   if (loading) {
@@ -204,31 +206,42 @@ export default function AppliedJobsPage() {
                     <p className="text-gray-600 mb-3">
                       Địa chỉ: {job.location}
                     </p>
+
                     <div className="mt-auto">
                       <div className="d-flex justify-content-between align-items-center mb-2 fs-5">
-                       Tình trạng: {getStatusBadge(job.status)}
-                        {job.isExpired && <span className="badge bg-danger px-3 py-1 rounded">Đã hết hạn</span>}
+                        Tình trạng: {getStatusBadge(job.status)}
+                        {job.isExpired && <span className="badge bg-danger px-3 py-1 rounded ms-2">Đã hết hạn</span>}
                       </div>
-                      <small className="text-muted fs-5">
+
+                      <small className="text-muted fs-5 d-block mb-3">
                         Ngày nộp: {new Date(job.created_at).toLocaleDateString('vi-VN')}
                       </small>
+
+                      {/* Hiển thị thời hạn còn lại */}
+                      {!job.isExpired && job.applicationDeadline && (
+                        <p className="text-success fw-bold mb-3">
+                          {getDaysRemaining(job.applicationDeadline)}
+                        </p>
+                      )}
+
+                      {/* NÚT RÚT HỒ SƠ – CHỈ HIỆN KHI CÒN HẠN VÀ KHÔNG BỊ TỪ CHỐI */}
+                      {canWithdraw(job) && (
+                        <button
+                          onClick={() => withdrawApplication(job.id)}
+                          disabled={withdrawing === job.id}
+                          className="btn btn-outline-danger w-100"
+                        >
+                          {withdrawing === job.id ? 'Đang rút...' : 'Rút hồ sơ'}
+                        </button>
+                      )}
+
+                      {/* Nếu bị từ chối hoặc hết hạn → không hiện nút rút */}
+                      {job.status === 'REJECTED' && (
+                        <p className="text-danger text-center mt-3 fw-bold">
+                          Hồ sơ đã bị từ chối
+                        </p>
+                      )}
                     </div>
-                     {/* HIỂN THỊ "CÒN X NGÀY" CHO JOB CÒN HẠN */}
-                    {!job.isExpired && job.applicationDeadline && (
-                      <p className="text-success fw-bold mb-3">
-                        {getDaysRemaining(job.applicationDeadline)}
-                      </p>
-                    )}
-                     {/* NÚT RÚT HỒ SƠ – CHỈ HIỆN CHO JOB CÒN HẠN */}
-                    {!job.isExpired && (
-                      <button
-                        onClick={() => withdrawApplication(job.id)}
-                        disabled={withdrawing === job.id}
-                        className="btn btn-outline-danger w-100 mb-3"
-                      >
-                        {withdrawing === job.id ? 'Đang rút...' : 'Rút hồ sơ'}
-                      </button>
-                    )}
                   </div>
                 </div>
               ))}
