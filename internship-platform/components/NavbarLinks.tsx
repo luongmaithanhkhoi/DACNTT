@@ -73,11 +73,11 @@ export default function NavbarLinks() {
 
      let profilePath = '/profile';
       if (savedRole === 'ENTERPRISE') {
-        profilePath = '/enterprises/dashboard'; // sửa thành đúng path
+        profilePath = '/enterprises/dashboard';
       } else if (savedRole === 'STUDENT') {
         profilePath = '/profile';
       } else if (savedRole === 'ADMIN') {
-        profilePath = '/faculty'; // hoặc '/admin/dashboard' tùy bạn
+        profilePath = '/faculty'; 
       }
       setProfileHref(profilePath);
     }
