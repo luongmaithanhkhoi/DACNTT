@@ -17,7 +17,7 @@ interface Job {
 interface Application {
   id: string;
   status: "PENDING" | "ACCEPTED" | "REJECTED";
-  appliedAt: string;
+  created_at: string;
   jobId: string;
   jobTitle: string;
   student: {
@@ -34,24 +34,20 @@ interface Application {
 
 export default function EnterpriseApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
-  const [allJobs, setAllJobs] = useState<Job[]>([]); // Để hiển thị tên job nếu cần sau
+  const [allJobs, setAllJobs] = useState<Job[]>([]); 
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Lọc theo trạng thái
   const [statusFilter, setStatusFilter] = useState<
     "ALL" | "PENDING" | "ACCEPTED" | "REJECTED"
   >("ALL");
 
-  // Modal xem CV
   const [selectedCV, setSelectedCV] = useState<string | null>(null);
 
-  // Loading khi cập nhật trạng thái
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  // Lấy danh sách jobs (chỉ để debug hoặc mở rộng sau, không bắt buộc cho filter status)
   useEffect(() => {
     const fetchJobs = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -109,7 +105,6 @@ export default function EnterpriseApplicationsPage() {
     fetchApplications();
   }, [currentPage, statusFilter]);
 
-  // Cập nhật trạng thái ứng tuyển
   const updateStatus = async (
     appId: string,
     newStatus: "ACCEPTED" | "REJECTED"
@@ -221,7 +216,7 @@ export default function EnterpriseApplicationsPage() {
                   }".`}
             </p>
             <Link
-              href="/enterprise/post-job"
+              href="/faculty/post-job"
               className="btn btn-danger px-6 py-3 fs-5"
             >
               Đăng tin tuyển dụng mới
@@ -272,21 +267,9 @@ export default function EnterpriseApplicationsPage() {
                       {getStatusBadge(app.status)}
                       <small className="text-muted">
                         Nộp:{" "}
-                        {new Date(app.appliedAt).toLocaleDateString("vi-VN")}
+                        {new Date(app.created_at).toLocaleDateString("vi-VN")}
                       </small>
                     </div>
-
-                    
-
-                    {/* Xem CV */}
-                    {app.student.cv_url && (
-                      <button
-                        onClick={() => setSelectedCV(app.student.cv_url!)}
-                        className="btn btn-outline-primary w-100"
-                      >
-                        Xem CV
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>

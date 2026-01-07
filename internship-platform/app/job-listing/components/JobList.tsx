@@ -243,16 +243,16 @@ export default function JobsList({
                         <li>{job.employment_type || "—"}</li>
                       </ul>
 
-                      <p className="para ">
+                      <div className="para ">
                         <div
                           className="ProseMirror text-dark lh-lg line-clamp-2"
                           dangerouslySetInnerHTML={{
                             __html: job.description || "Không có mô tả chi tiết.",
                           }}
-/>
+                              /> 
                         {/* {job.description?.slice(0, 180) || "Không có mô tả."}
                         {job.description && job.description.length > 180 ? "..." : ""} */}
-                      </p>
+                      </div>
                     </div>
 
                     <div className="col-xl-3">

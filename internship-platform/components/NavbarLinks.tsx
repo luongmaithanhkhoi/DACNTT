@@ -71,15 +71,15 @@ export default function NavbarLinks() {
       const savedRole = localStorage.getItem('user_role');
       setRole(savedRole);
 
+     let profilePath = '/profile';
       if (savedRole === 'ENTERPRISE') {
-        setProfileHref('/enterprises/dashboard'); // sửa thành đúng path
+        profilePath = '/enterprises/dashboard'; // sửa thành đúng path
       } else if (savedRole === 'STUDENT') {
-        setProfileHref('/profile');
+        profilePath = '/profile';
       } else if (savedRole === 'ADMIN') {
-        setProfileHref('/faculty'); // hoặc '/admin/dashboard' tùy bạn
-      } else {
-        setProfileHref('/profile');
+        profilePath = '/faculty'; // hoặc '/admin/dashboard' tùy bạn
       }
+      setProfileHref(profilePath);
     }
   }, []);
 

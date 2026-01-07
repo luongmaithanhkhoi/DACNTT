@@ -24,11 +24,7 @@ export default function ProfilePage() {
         <title>My Profile | Job Finder</title>
       </Head>
 
-      <div className="inner-heading">
-        <div className="container">
-          <h1>My Profile</h1>
-        </div>
-      </div>
+      
 
       <ProfileContent data={data} />
 

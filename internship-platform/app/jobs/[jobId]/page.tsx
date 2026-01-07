@@ -85,11 +85,11 @@ export default async function StudentJobDetailPage({
 
   return (
     <>
-      <div className="inner-heading">
+      {/* <div className="inner-heading">
         <div className="container">
           <h3>Chi tiết công việc</h3>
         </div>
-      </div>
+      </div> */}
 
       <div className="inner-content loginWrp">
         <div className="container">
