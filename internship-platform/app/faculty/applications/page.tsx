@@ -242,7 +242,7 @@ export default function EnterpriseApplicationsPage() {
                     <div>
                       <h5>
                         <Link
-                          href={`/student/${app.student.id}`}
+                          href={`/students/${app.student.id}`}
                           className="text-primary text-decoration-none"
                         >
                           {app.student.fullName}

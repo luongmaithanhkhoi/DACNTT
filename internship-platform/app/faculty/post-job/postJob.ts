@@ -1,3 +1,5 @@
+// app/post-job/postJob.ts
+
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -34,7 +36,7 @@ interface JobData {
   internship_period: string | null;
   require_gpa_min: number | null;
   application_deadline: string | null;
-  skills?: SelectedSkill[]; // Kỹ năng khi edit
+  skills?: SelectedSkill[];
 }
 
 interface UsePostJobLogicProps {
@@ -42,13 +44,15 @@ interface UsePostJobLogicProps {
   enterpriseId: string;
   isEdit?: boolean;
   jobId?: string;
+  isAdmin?: boolean; // Thêm để biết là admin
 }
 
 export function usePostJobLogic({
   initialData = null,
-  enterpriseId,
+  enterpriseId: propEnterpriseId = "",
   isEdit = false,
   jobId = "",
+  isAdmin = false,
 }: UsePostJobLogicProps) {
   const router = useRouter();
 
@@ -60,13 +64,11 @@ export function usePostJobLogic({
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
-  // Controlled state
   const [jobType, setJobType] = useState<string>(initialData?.job_type || "");
   const [categoryId, setCategoryId] = useState<string>(initialData?.category_id || "");
   const [workMode, setWorkMode] = useState<string>(initialData?.work_mode || "");
   const [locationId, setLocationId] = useState<string>(initialData?.location_id || "");
 
-  // State cho skills
   const [selectedSkills, setSelectedSkills] = useState<SelectedSkill[]>(
     initialData?.skills || []
   );
@@ -79,17 +81,16 @@ export function usePostJobLogic({
         const [locRes, catRes, skillRes] = await Promise.all([
           fetch('/api/locations', { cache: 'no-store' }),
           fetch('/api/job-categories', { cache: 'no-store' }),
-          fetch('/api/skills', { cache: 'no-store' }), 
+          fetch('/api/skills', { cache: 'no-store' }),
         ]);
 
         const locJson = await locRes.json();
         const catJson = await catRes.json();
         const skillJson = await skillRes.json();
-        console.log("Skills raw:", skillJson);
 
-        setLocations(Array.isArray(locJson) ? locJson : []);
-        setCategories(Array.isArray(catJson) ? catJson : []);
-       setSkills(Array.isArray(skillJson.data) ? skillJson.data : []);
+        setLocations(Array.isArray(locJson) ? locJson : locJson.data || []);
+        setCategories(Array.isArray(catJson) ? catJson : catJson.data || []);
+        setSkills(Array.isArray(skillJson.data) ? skillJson.data : skillJson || []);
       } catch (err) {
         console.error("Lỗi tải dữ liệu form:", err);
         setMessage({ type: "error", text: "Không thể tải dữ liệu" });
@@ -106,7 +107,7 @@ export function usePostJobLogic({
       const existing = prev.find(s => s.skill_id === skillId);
       if (existing) {
         if (level === 0) {
-          return prev.filter(s => s.skill_id !== skillId); // Xóa nếu level = 0
+          return prev.filter(s => s.skill_id !== skillId);
         }
         return prev.map(s => s.skill_id === skillId ? { ...s, required_level: level } : s);
       }
@@ -136,7 +137,7 @@ export function usePostJobLogic({
         ? parseFloat(formData.get("require_gpa_min") as string)
         : null,
       application_deadline: formData.get("application_deadline")?.toString() || null,
-      skills: selectedSkills, // ← Gửi mảng skills
+      skills: selectedSkills,
     };
 
     if (!data.title || !data.category_id || !data.job_type || !data.location_id) {
@@ -146,19 +147,22 @@ export function usePostJobLogic({
     }
 
     try {
-      const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-      const currentEnterpriseId = typeof window !== 'undefined' 
-          ? localStorage.getItem('enterprise_id')
-          : null;
+      let currentEnterpriseId = propEnterpriseId;
 
-        if (!currentEnterpriseId) {
-          setMessage({ type: "error", text: "Không tìm thấy doanh nghiệp. Vui lòng đăng nhập lại." });
+      // Nếu là admin → lấy từ dropdown
+      if (isAdmin) {
+        const selectElement = document.getElementById('admin-enterprise-select') as HTMLSelectElement;
+        if (!selectElement || !selectElement.value) {
+          setMessage({ type: "error", text: "Vui lòng chọn doanh nghiệp!" });
           setLoading(false);
           return;
-}
+        }
+        currentEnterpriseId = selectElement.value;
+      }
+
       const url = isEdit
-        ? `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs/${jobId}`
-        : `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs`;
+        ? `/api/enterprises/${currentEnterpriseId}/jobs/${jobId}`
+        : `/api/enterprises/${currentEnterpriseId}/jobs`;
 
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
@@ -185,7 +189,7 @@ export function usePostJobLogic({
         }
 
         setTimeout(() => {
-          router.push(`/enterprises/${enterpriseId}/jobs`);
+          router.push(isAdmin ? '/admin/jobs' : `/faculty/jobs`);
           router.refresh();
         }, 2000);
       } else {
@@ -219,4 +223,3 @@ export function usePostJobLogic({
     handleSkillChange,
   };
 }
-

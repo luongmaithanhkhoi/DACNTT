@@ -233,7 +233,7 @@ export default function ProfilePage() {
                   </Link>
                 </div>
                 <div className="col-md-4">
-                  <Link href="/post-job" className="btn btn-danger w-100 py-4 fs-4">
+                  <Link href="/faculty/post-job" className="btn btn-danger w-100 py-4 fs-4">
                     <i className="fa fa-plus-circle fa-2x mb-3 d-block" />
                     Đăng tin mới
                   </Link>
