@@ -68,34 +68,6 @@ export default function Header() {
                   role="navigation"
                 >
                   <div className="navbar-header"> </div>
-                  {/* <div className="navbar-collapse collapse" id="navbarScroll">
-                    <ul
-                      className="nav navbar-nav"
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: 24,
-                      }}
-                    >
-                      <li>
-                        {" "}
-                        <Link href="/" className="active">
-                          {" "}
-                          Trang Chủ
-                        </Link>
-                      </li>
-                      <li>
-                        {" "}
-                        <Link href="/job-listing"> Tuyển Dụng </Link>
-                      </li>
-                      <li>
-                        {" "}
-                        <Link href="blog.html"> Tin Tức</Link>
-                      </li>
-                    </ul>
-                  </div> */}
                   <NavbarLinks />
 
                   <div className="clearfix" />

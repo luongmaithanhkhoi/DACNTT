@@ -15,7 +15,7 @@ export async function GET(
   { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
-    const { id } = await params;          // ✅ unwrap params
+    const { id } = await params;         
     const safeId = goodId(id);
 
     if (!safeId) {
@@ -50,7 +50,6 @@ export async function GET(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // ✅ lấy tags
     const { data: et, error: etErr } = await sb
       .from("EventTag")
       .select("tag_id")

@@ -193,10 +193,22 @@ export default function EventList({
                     </div>
                   </div>
 
-                  <p>
+                  {/* <p>
                     {(ev.description ?? "").slice(0, 160)}
                     {ev.description && ev.description.length > 160 ? "..." : ""}
-                  </p>
+                  </p> */}
+                  <div className="para ">
+                        <div
+                          className="ProseMirror text-dark lh-lg line-clamp-2"
+                          dangerouslySetInnerHTML={{
+                            __html: ev.description || "Không có mô tả chi tiết.",
+                          }}
+                              /> 
+                        {/* {job.description?.slice(0, 180) || "Không có mô tả."}
+                        {job.description && job.description.length > 180 ? "..." : ""} */}
+                      </div>
+
+
 
                   <div className="view-btn">
                     <a href={`/events/${ev.id}`}>Read More</a>

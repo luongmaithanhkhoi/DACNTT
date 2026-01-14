@@ -74,67 +74,6 @@ export async function GET(
   }
 }
 
-
-// export async function GET(
-//   request: NextRequest,
-//   context: { params: { id: string } }
-// ) {
-//   try {
-//     const { id } = await context.params
-//     const searchParams = request.nextUrl.searchParams
-//     const isOpen = searchParams.get('is_open')
-//     const keyword = searchParams.get('keyword')
-//     // let query = supabase
-//     //   .from('JobPosting')
-//     //   .select(`
-//     //     *,
-//     //     skills:JobSkill(
-//     //       required_level,
-//     //       skill:Skill(id, name)
-//     //     ),
-//     //     applications:Application(count)
-//     //   `)
-//     //   .eq('enterprise_id', id)
-//     //   .order('created_at', { ascending: false })
-
-
-//     let query = supabase
-//       .from('JobPosting')
-//       .select(`
-//         id,
-//         title,
-//         description,
-//         created_at,
-//         is_open,
-//         job_type,
-//         work_mode,
-//         category:JobCategory(id, name),
-//         location:Location(id, name)
-//       `)
-//       .eq('enterprise_id', id)
-//       .order('created_at', { ascending: false });
-      
-//     if (isOpen !== null) {
-//       query = query.eq('is_open', isOpen === 'true')
-//     }
-//     if (keyword) {
-//       query = query.or(`title.ilike.%${keyword}%,description.ilike.%${keyword}%`)
-//     }
-
-//     const { data, error } = await query
-
-//     if (error) throw error
-
-//     return NextResponse.json({ success: true, data })
-//   } catch (error) {
-//     const message = error instanceof Error ? error.message : 'Lỗi server'
-//     return NextResponse.json(
-//       { success: false, error: message },
-//       { status: 500 }
-//     )
-//   }
-// }
-
 // POST /api/enterprises/:id/jobs - Tạo job mới
 export async function POST(
   request: NextRequest,

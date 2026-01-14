@@ -14,7 +14,7 @@ export default function LogoutButton() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    // Xác nhận trước khi logout (tùy chọn)
+    // Xác nhận trước khi logout 
     if (!confirm('Bạn có chắc muốn đăng xuất?')) return;
 
     const { error } = await supabase.auth.signOut();
@@ -25,7 +25,7 @@ export default function LogoutButton() {
       return;
     }
 
-    // Xóa localStorage nếu bạn lưu thủ công (tùy chọn)
+    // Xóa localStorage 
     localStorage.removeItem('auth_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');

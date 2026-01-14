@@ -137,7 +137,7 @@ export function useEnterpriseJobs(enterpriseId: string) {
       const res = await fetch(`${baseUrl}/api/enterprises/${enterpriseId}/jobs/${jobId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_open: true }), // Chỉ cần gửi trường này
+        body: JSON.stringify({ is_open: true }), 
         cache: "no-store",
       });
 

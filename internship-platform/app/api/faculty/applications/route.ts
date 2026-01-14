@@ -16,7 +16,7 @@ function getBearerToken(req: Request): string | null {
   return scheme?.toLowerCase() === 'bearer' ? token : null;
 }
 
-// Kiểm tra role (admin hoặc faculty)
+// Kiểm tra role
 async function getUserRole(token: string): Promise<string | null> {
   const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: `Bearer ${token}` } },
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = 9;
     const offset = (page - 1) * limit;
-    const statusFilter = searchParams.get('status'); // ALL, PENDING, ACCEPTED, REJECTED
+    const statusFilter = searchParams.get('status'); 
 
    
     let query = supabaseAdmin

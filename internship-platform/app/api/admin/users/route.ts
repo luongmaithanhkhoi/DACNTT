@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'email/password/role required' }, { status: 400 })
     }
 
-    // 1) Create Supabase Auth user (email/password)
+    // Create Supabase Auth user (email/password)
     const adminAuth = createClient(url, service, { auth: { persistSession: false } })
     const { data: created, error: createErr } = await adminAuth.auth.admin.createUser({
       email: body.email,
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     }
     const authId = created.user.id
 
-    // 2) Map vào bảng ứng dụng "User"
+    // Map vào bảng ứng dụng "User"
     const { data: appUser, error: appUserErr } = await adminAuth
       .from('User')
       .insert({
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: appUserErr?.message ?? 'insert app user failed' }, { status: 400 })
     }
 
-    // 3) Nếu role = STUDENT → tạo dòng Student; nếu ENTERPRISE → tạo EnterpriseUser
+    // Nếu role = STUDENT → tạo dòng Student; nếu ENTERPRISE → tạo EnterpriseUser
     if (body.role === 'STUDENT') {
       const { error: stuErr } = await adminAuth
         .from('Student')

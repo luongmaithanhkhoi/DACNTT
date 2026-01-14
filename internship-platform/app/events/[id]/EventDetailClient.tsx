@@ -64,14 +64,24 @@ export default function EventDetailClient({ ev }: { ev: EventDetail }) {
 
                     <hr />
 
-                    <div className="postmeta">
-                      {ev.description ?? "Chưa có mô tả."}
+                    <div className="postmeta ProseMirror">
+                      <div
+                          dangerouslySetInnerHTML={{
+                            __html: ev.description || 'Không có mô tả chi tiết.',
+                          }}
+                        >
+                      </div>
+                      
+                      {/* {ev.description ?? "Chưa có mô tả."} */}
                     </div>
+                   
+        
 
                     {ev.tags && ev.tags.length > 0 && (
                       <>
                         <hr />
-                        <div className="postmeta">
+                        <div className="postmeta ">
+                          
                           <strong>Tags:</strong>{" "}
                           {ev.tags.map((t) => (
                             <span

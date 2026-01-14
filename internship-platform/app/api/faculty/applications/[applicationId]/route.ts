@@ -1,5 +1,3 @@
-// app/api/enterprises/applications/[applicationId]/route.ts
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -50,7 +48,6 @@ export async function PATCH(
     const enterpriseId = await getEnterpriseId(token);
     if (!enterpriseId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    // ← Đây là chỗ quan trọng: phải await params
     const params = await context.params;
     const applicationId = params.applicationId;
 
@@ -60,7 +57,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Trạng thái không hợp lệ' }, { status: 400 });
     }
 
-    // Kiểm tra application tồn tại và thuộc doanh nghiệp này
+    // Kiểm tra application tồn tại
     const { data: application, error: fetchError } = await supabaseAdmin
       .from('Application')
       .select('job_id')

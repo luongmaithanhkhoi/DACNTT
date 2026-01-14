@@ -4,11 +4,11 @@ export default function PostJobPage() {
   return (
     <>
       {/* Inner Heading */}
-      <div className="inner-heading">
+      {/* <div className="inner-heading">
         <div className="container">
           <h3>Post a Job</h3>
         </div>
-      </div>
+      </div> */}
 
       {/* Inner Content */}
       <div className="inner-content loginWrp">

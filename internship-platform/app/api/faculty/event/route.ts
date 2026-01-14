@@ -10,7 +10,6 @@ export async function GET(req: Request) {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // Query lấy toàn bộ dữ liệu sự kiện
     const { data: events, error, count } = await sb
       .from("Event")
       .select(

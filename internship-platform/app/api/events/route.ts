@@ -15,7 +15,7 @@ const clean = (s: string | null) => {
   return t === "" || t === "undefined" || t === "null" ? null : t;
 };
 
-// ✅ whitelist order_by để tránh lỗi + injection
+
 const ORDERABLE = new Set([
   "start_date",
   "end_date",
@@ -29,12 +29,12 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
 
     const q = clean(searchParams.get("q"));
-    const status = clean(searchParams.get("status"));              // PUBLISHED|CLOSED|DRAFT
-    const categoryId = clean(searchParams.get("category_id"));     // ✅ NEW
+    const status = clean(searchParams.get("status"));              
+    const categoryId = clean(searchParams.get("category_id"));   
     const location = clean(searchParams.get("location"));
-    const from = clean(searchParams.get("from"));                  // ISO date
-    const to = clean(searchParams.get("to"));                      // ISO date
-    const tag = clean(searchParams.get("tag"));                    // giữ nếu bạn còn dùng Tag
+    const from = clean(searchParams.get("from"));                  
+    const to = clean(searchParams.get("to"));                      
+    const tag = clean(searchParams.get("tag"));                   
 
     const limit = Math.min(toInt(searchParams.get("limit"), 10), 200);
     const offset = Math.max(0, Number(searchParams.get("offset") ?? 0) || 0);
@@ -50,9 +50,8 @@ export async function GET(req: Request) {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // ✅ BỎ event_type khỏi select (vì bạn đã bỏ cột đó)
     let query = sb
-      .from("Event") // 🔁 đổi thành "events" nếu table bạn là events
+      .from("Event") 
       .select(
         `
         id,
@@ -75,18 +74,11 @@ export async function GET(req: Request) {
     if (categoryId) query = query.eq("category_id", categoryId);
     if (location) query = query.ilike("location", `%${location}%`);
 
-    // search title + description
     if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
 
-    // date range
     if (from) query = query.gte("start_date", from);
-
-    // ⚠️ nếu end_date hay NULL, dùng start_date để filter "to" cho chắc
-    // (hoặc bạn muốn chặt hơn thì có thể dùng end_date khi có)
     if (to) {
       query = query.lte("start_date", to);
-      // Nếu muốn: event nào có end_date thì dùng end_date, còn null thì dùng start_date:
-      // query = query.or(`end_date.is.null,start_date.lte.${to},end_date.lte.${to}`);
     }
 
     const { data: baseEvents, error: baseErr, count } = await query;
@@ -94,7 +86,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: baseErr.message }, { status: 400 });
     }
 
-    // Nếu không filter tag -> trả luôn
     if (!tag) {
       return NextResponse.json({
         total: count ?? 0,
@@ -103,7 +94,6 @@ export async function GET(req: Request) {
       });
     }
 
-    // ====== Tag filter (giữ nguyên nếu bạn còn bảng Tag/EventTag) ======
     const { data: tagRows, error: tagErr } = await sb
       .from("Tag")
       .select("id")

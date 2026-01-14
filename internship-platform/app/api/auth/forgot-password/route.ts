@@ -11,7 +11,6 @@ export async function POST(req: Request) {
     const sb = createClient(url, anon, { auth: { persistSession: false } })
 
     // Khi gọi, Supabase sẽ gửi link /auth/v1/verify?type=recovery&token=...
-    // Link sẽ chuyển về SITE URL của bạn với hash.
     const { error } = await sb.auth.resetPasswordForEmail(email, {
       redirectTo: 'http://localhost:3000/auth/update-password'
     })

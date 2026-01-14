@@ -49,7 +49,7 @@ export function useLogin() {
 
       // 4. LƯU ROLE VÀO LOCALSTORAGE
       localStorage.setItem('user_role', appUser.role);
-      localStorage.setItem('app_user_id', appUser.id); // Lưu ID app user (dùng cho API)
+      localStorage.setItem('app_user_id', appUser.id); 
 
       let enterpriseId: string | null = null;
 

@@ -7,7 +7,7 @@ const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export async function PUT(req: NextRequest) {
   try {
     const id = req.nextUrl.searchParams.get("id");
-    const { status } = await req.json();  // lấy thông tin status từ body yêu cầu
+    const { status } = await req.json();  
 
     if (!status || !["APPROVED", "REJECTED"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });

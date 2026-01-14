@@ -3,13 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  // Dùng SERVICE_ROLE để bypass RLS khi cần (chỉ chạy server)
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 const TABLE = "event_categories";
 
-// Whitelist cột order_by để tránh inject
+// Whitelist order_by
 const ORDERABLE = new Set(["created_at", "name", "slug"]);
 
 export async function GET(req: Request) {
@@ -33,9 +32,8 @@ export async function GET(req: Request) {
       .order(orderCol, { ascending })
       .range(offset, offset + limit - 1);
 
-    // search theo name/slug
+ 
     if (q) {
-      // ilike = case-insensitive
       query = query.or(`name.ilike.%${q}%,slug.ilike.%${q}%`);
     }
 

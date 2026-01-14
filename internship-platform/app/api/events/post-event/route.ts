@@ -1,12 +1,10 @@
-// app/api/enterprise/events/route.ts
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_SVC = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SVC);
 
 function getBearerToken(req: Request): string | null {
   const authHeader = req.headers.get('authorization');
@@ -15,37 +13,32 @@ function getBearerToken(req: Request): string | null {
   return scheme?.toLowerCase() === 'bearer' ? token : null;
 }
 
-async function getEnterpriseId(token: string): Promise<string | null> {
-  const authClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+async function getUserRoleAndId(token: string): Promise<{ role: string | null; userId: string | null }> {
+  const authClient = createClient(SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     global: { headers: { Authorization: `Bearer ${token}` } },
   });
 
   const { data: { user } } = await authClient.auth.getUser();
-  if (!user) return null;
+  if (!user) return { role: null, userId: null };
 
   const { data: appUser } = await supabaseAdmin
     .from('User')
-    .select('id')
+    .select('id, role')
     .eq('provider_uid', user.id)
     .single();
 
-  if (!appUser) return null;
-
-  const { data: link } = await supabaseAdmin
-    .from('EnterpriseUser')
-    .select('enterprise_id')
-    .eq('user_id', appUser.id)
-    .single();
-
-  return link?.enterprise_id || null;
+  return { role: appUser?.role || null, userId: appUser?.id || null };
 }
+
 export async function POST(req: Request) {
   try {
     const token = getBearerToken(req);
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const enterpriseId = await getEnterpriseId(token);
-    if (!enterpriseId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const { role, userId } = await getUserRoleAndId(token);
+    if (role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden: Chỉ admin mới được đăng sự kiện' }, { status: 403 });
+    }
 
     const body = await req.json();
 
@@ -65,31 +58,10 @@ export async function POST(req: Request) {
 
     if (!title) return NextResponse.json({ error: 'Tiêu đề là bắt buộc' }, { status: 400 });
 
-    // LẤY APP USER ID (User.id) TỪ TOKEN
-    const authClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-    });
-
-    const { data: { user } } = await authClient.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-
-    const { data: appUser, error: userError } = await supabaseAdmin
-      .from('User')
-      .select('id')
-      .eq('provider_uid', user.id)
-      .single();
-
-    if (userError || !appUser) {
-      return NextResponse.json({ error: 'Không tìm thấy user trong hệ thống' }, { status: 404 });
-    }
-
-    const creatorId = appUser.id; // ← ĐÚNG ID ĐỂ INSERT
-
-    // Insert event
     const { data: event, error: eventError } = await supabaseAdmin
       .from('Event')
       .insert({
-        creator_id: creatorId, // ← SỬA Ở ĐÂY
+        creator_id: userId,  // Sử dụng userId của admin
         title,
         description,
         start_date: start_date || null,
@@ -111,7 +83,6 @@ export async function POST(req: Request) {
 
     // Thêm tags nếu có
     if (tags.length > 0) {
-      // Giả sử tag là string name → cần tìm hoặc tạo Tag trước
       for (const tagName of tags) {
         const { data: existingTag } = await supabaseAdmin
           .from('Tag')

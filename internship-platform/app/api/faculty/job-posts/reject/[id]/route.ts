@@ -7,16 +7,14 @@ const supabase = createClient(url, anon);
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Dùng await để giải quyết Promise của params
-    const { id } = await params; // Dùng await ở đây
+    const { id } = await params; 
 
-    console.log("Job ID from URL:", id);  // Để kiểm tra
+    console.log("Job ID from URL:", id);  
 
     if (!id) {
       return NextResponse.json({ success: false, error: "jobId is missing" }, { status: 400 });
     }
 
-    // Cập nhật trạng thái công việc từ "PENDING" thành "APPROVED"
     const { data, error } = await supabase
       .from("JobPosting")
       .update({ status: "REJECTED" })

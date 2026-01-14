@@ -220,22 +220,28 @@ export default function ProfilePage() {
             <div className="mt-5">
               <h2 className="fs-3 fw-bold mb-4">Tìm kiếm & Quản lý Hồ Sơ</h2>
               <div className="row g-4 text-center">
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <Link href="/faculty/jobs" className="btn btn-outline-primary w-100 py-4 fs-4">
                     <i className="fa fa-briefcase fa-2x mb-3 d-block" />
                     Quản Lý Bài Đăng
                   </Link>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <Link href="/faculty/applications" className="btn btn-outline-success w-100 py-4 fs-4">
                     <i className="fa fa-users fa-2x mb-3 d-block" />
                     Xem hồ sơ ứng tuyển
                   </Link>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <Link href="/faculty/post-job" className="btn btn-danger w-100 py-4 fs-4">
                     <i className="fa fa-plus-circle fa-2x mb-3 d-block" />
                     Đăng tin mới
+                  </Link>
+                </div>
+                <div className="col-md-3">
+                  <Link href="/post-event" className="btn btn-primary w-100 py-4 fs-4">
+                    <i className="fa fa-plus-circle fa-2x mb-3 d-block" />
+                    Đăng event mới
                   </Link>
                 </div>
               </div>

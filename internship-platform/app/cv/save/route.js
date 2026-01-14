@@ -11,13 +11,6 @@ export async function POST(request) {
   try {
     const { userId, cvData, cvFile } = await request.json();
 
-    // if (!userId) {
-    //   return NextResponse.json(
-    //     { error: 'User ID is required' },
-    //     { status: 400 }
-    //   );
-    // }
-
     // 1. Cập nhật thông tin Student
     const { data: studentData, error: studentError } = await supabase
       .from('Student')
@@ -47,7 +40,7 @@ export async function POST(request) {
       throw new Error(`Error updating Student: ${studentError.message}`);
     }
 
-    // 2. Xử lý Skills
+    // Xử lý Skills
     if (cvData.skills && cvData.skills.length > 0) {
       // Xóa các skill cũ
       await supabase

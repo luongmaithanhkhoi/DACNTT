@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     const {
       email,
       password,
-      role, // 'STUDENT' hoặc 'ENTERPRISE'
+      role, // 'STUDENT', 'ENTERPRISE'
       full_name,
       major,
       enterprise_name,
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Role không hợp lệ' }, { status: 400 });
     }
 
-    // 1. Tạo user trong Supabase Auth bằng admin (bypass signup disabled)
+    // Tạo user trong Supabase Auth bằng admin
     const { data: newUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
     const authUserId = newUser.user.id;
 
-    // 2. Tạo record trong bảng User
+    // Tạo record trong bảng User
     const { data: appUser, error: userError } = await supabaseAdmin
       .from('User')
       .insert({
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Không thể tạo hồ sơ người dùng' }, { status: 500 });
     }
 
-    // 3. Nếu là STUDENT → tạo record Student
+    // Nếu là STUDENT, tạo record Student
     if (role === 'STUDENT') {
       const { error: studentError } = await supabaseAdmin
         .from('Student')
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // 4. Nếu là ENTERPRISE → tạo Enterprise + EnterpriseUser
+    // Nếu là ENTERPRISE → tạo Enterprise + EnterpriseUser
     if (role === 'ENTERPRISE') {
       if (!enterprise_name) {
         return NextResponse.json({ error: 'Tên doanh nghiệp là bắt buộc' }, { status: 400 });

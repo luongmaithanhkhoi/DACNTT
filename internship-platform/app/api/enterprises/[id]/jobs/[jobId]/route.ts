@@ -92,45 +92,6 @@ export async function GET(
   }
 }
 
-// export async function PUT(
-//   request: NextRequest,
-//   { params }: { params: Promise<{ id: string; jobId: string }> }
-// ) {
-//   const { id: enterpriseId, jobId } = await params;
-
-//   try {
-//     const body = await request.json();
-
-//     const { data, error } = await supabase
-//       .from('JobPosting')
-//       .update({
-//         title: body.title,
-//         description: body.description,
-//         category_id: body.category_id,
-//         job_type: body.job_type,
-//         work_mode: body.work_mode,
-//         location_id: body.location_id,
-//         internship_period: body.internship_period || null,
-//         require_gpa_min: body.require_gpa_min || null,
-//         application_deadline: body.application_deadline || null,
-//         is_open: body.is_open, // Cho phép đóng/mở lại
-//       })
-//       .eq('id', jobId)
-//       .eq('enterprise_id', enterpriseId)
-//       .select()
-//       .single();
-
-//     if (error) throw error;
-
-//     return NextResponse.json({ success: true, data, message: 'Cập nhật công việc thành công' });
-//   } catch (err) {
-//     console.error('Lỗi update job:', err);
-//     return NextResponse.json(
-//       { success: false, error: 'Không thể cập nhật công việc' },
-//       { status: 500 }
-//     );
-//   }
-// }
 
 export async function PUT(
   request: NextRequest,
@@ -149,7 +110,7 @@ export async function PUT(
       .from('JobPosting')
       .update({
         ...jobUpdateFields,
-        updated_at: new Date().toISOString(), // tự động cập nhật thời gian
+        updated_at: new Date().toISOString(), 
       })
       .eq('id', jobId)
       .eq('enterprise_id', enterpriseId);
@@ -171,12 +132,11 @@ export async function PUT(
 
     if (deleteSkillsError) {
       console.error('Lỗi xóa kỹ năng cũ:', deleteSkillsError);
-      // Không return error – vẫn coi là thành công (kỹ năng sẽ được thêm lại)
+     
     }
 
-    // Thêm kỹ năng mới (nếu có)
+    
     if (skills && Array.isArray(skills) && skills.length > 0) {
-      // Lọc chỉ những skill có level > 0
       const validSkills = skills.filter((s: any) => s.required_level > 0);
 
       if (validSkills.length > 0) {

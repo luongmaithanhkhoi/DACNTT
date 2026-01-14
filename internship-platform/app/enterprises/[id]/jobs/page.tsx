@@ -61,11 +61,11 @@ export default function EnterpriseJobList() {
 
   return (
     <>
-      <div className="inner-heading">
+      {/* <div className="inner-heading">
         <div className="container">
           <h3>Danh sách công việc</h3>
         </div>
-      </div>
+      </div> */}
 
       <div className="bg-gray-50 py-8">
         <div className="container mx-auto px-4">

@@ -5,7 +5,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Tạo client admin (service role key) – QUAN TRỌNG
+// Tạo client admin (service role key) 
 const adminSb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 function getBearerToken(req: Request): string | null {
@@ -48,7 +48,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'Enterprise not linked' }, { status: 404 });
     }
     const { id } = await params;
-    // Kiểm tra params.id có khớp enterprise_id không (bảo mật)
     if (entLink.enterprise_id !== id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
