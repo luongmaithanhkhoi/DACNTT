@@ -45,7 +45,7 @@ export default function EventSidebar({
   // Recent events
   useEffect(() => {
     fetch(
-      "/api/events?limit=5&offset=0&order_by=start_date&order_dir=desc&status=PUBLISHED",
+      "/api/events?limit=5&offset=0&order_by=start_date&order_dir=desc&status=APPROVED",
       { cache: "no-store" }
     )
       .then((r) => r.json())

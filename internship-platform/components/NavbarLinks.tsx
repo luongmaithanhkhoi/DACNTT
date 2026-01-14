@@ -71,15 +71,15 @@ export default function NavbarLinks() {
       const savedRole = localStorage.getItem('user_role');
       setRole(savedRole);
 
+      let profilePath = '/profile';
       if (savedRole === 'ENTERPRISE') {
-        setProfileHref('/enterprise/dashboard'); // sửa thành đúng path
+        profilePath = '/enterprises/dashboard'; // sửa thành đúng path
       } else if (savedRole === 'STUDENT') {
-        setProfileHref('/profile');
+        profilePath = '/profile';
       } else if (savedRole === 'ADMIN') {
-        setProfileHref('/faculty'); // hoặc '/admin/dashboard' tùy bạn
-      } else {
-        setProfileHref('/profile');
+        profilePath = '/faculty'; // hoặc '/admin/dashboard' tùy bạn
       }
+      setProfileHref(profilePath);
     }
   }, []);
 
@@ -90,6 +90,7 @@ export default function NavbarLinks() {
 
   // Check active cho menu PROFILE (xử lý nhiều path theo role)
   const isProfileActive = () => {
+    console.log('Checking active for role:', role, 'on path:', pathname);
     if (role === 'STUDENT') return pathname.startsWith('/profile');
     if (role === 'ENTERPRISE') return pathname.startsWith('/enterprise');
     if (role === 'ADMIN') return pathname.startsWith('/faculty') || pathname.startsWith('/admin');
