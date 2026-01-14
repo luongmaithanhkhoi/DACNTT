@@ -32,7 +32,7 @@ export default function Home() {
   return (
     <>
       {/* Revolution slider start */}
-      <div className="tp-banner-container">
+      {/* <div className="tp-banner-container">
         <div className="tp-banner">
           <ul>
             <li
@@ -125,7 +125,7 @@ export default function Home() {
             </li>
           </ul>
         </div>
-      </div>
+      </div> */}
       {/* Revolution slider end */}
       {/*slider start*/}
       <div className="slider-wrap slidrWrp">

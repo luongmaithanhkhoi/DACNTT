@@ -29,11 +29,11 @@ export default function EventPage() {
   return (
     <>
       {/*inner heading start*/}
-      <div className="inner-heading">
+      {/* <div className="inner-heading">
         <div className="container">
           <h3>Blog</h3>
         </div>
-      </div>
+      </div> */}
       {/*inner heading end*/}
       {/*Inner Content start*/}
       <div className="inner-content blog-wrap">

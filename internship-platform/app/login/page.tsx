@@ -10,11 +10,11 @@ export default function LoginPage() {
         <title>Login | Job Finder</title>
       </Head>
 
-      <div className="inner-heading">
+      {/* <div className="inner-heading">
         <div className="container">
           <h3>Login</h3>
         </div>
-      </div>
+      </div> */}
 
       <div className="inner-content loginWrp">
         <div className="container">

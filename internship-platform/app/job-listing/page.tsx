@@ -50,11 +50,11 @@ export default function JobListing() {
     <>
       <>
         {/*inner heading start*/}
-        <div className="inner-heading">
+        {/* <div className="inner-heading">
           <div className="container">
             <h3>Job Listing</h3>
           </div>
-        </div>
+        </div> */}
         {/*inner heading end*/}
         {/*Inner Content start*/}
         <div className="inner-content listing">
