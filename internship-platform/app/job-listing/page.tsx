@@ -212,9 +212,6 @@ export default function JobListing() {
                         />
                       </div>
                     </form>
-                    <div className="ad">
-                      <img src="images/ad.jpg"></img>
-                    </div>
                   </div>
                 </div>
               </div>

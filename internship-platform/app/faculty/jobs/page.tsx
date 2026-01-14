@@ -325,9 +325,9 @@ export default function EnterpriseJobList() {
                     <span className="fs-5">Trạng thái: </span>
                     <span
                       className={`inline-block px-3 fs-5 py-1 text-base rounded-full font-semibold mb-3 ${statusStyle(
-                        job.status === "APPROVED" && !job.is_open
+                        (job.status === "APPROVED" && !job.is_open
                           ? "CLOSED"
-                          : job.status
+                          : job.status) as "APPROVED" | "REJECTED" | "PENDING" | "CLOSED"
                       )}`}
                     >
                       {

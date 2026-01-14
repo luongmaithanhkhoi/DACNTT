@@ -24,7 +24,6 @@ export default function ProfilePage() {
         <title>My Profile | Job Finder</title>
       </Head>
 
-      
 
       <ProfileContent data={data} />
 

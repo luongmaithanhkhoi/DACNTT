@@ -59,6 +59,7 @@ export default function NavbarLinks() {
 
   // Kiểm tra active cho PROFILE (xử lý nhiều path theo role)
   const isProfileActive = () => {
+    console.log('Checking active for role:', role, 'on path:', pathname);
     if (role === 'STUDENT') return pathname.startsWith('/profile');
     if (role === 'ENTERPRISE') return pathname.startsWith('/enterprise');
     if (role === 'ADMIN' || role === 'FACULTY') return pathname.startsWith('/faculty') || pathname.startsWith('/admin');

@@ -24,7 +24,7 @@ export default function HomeLatestBlogs() {
 
   useEffect(() => {
     fetch(
-      "/api/events?limit=3&offset=0&order_by=start_date&order_dir=desc&status=PUBLISHED",
+      "/api/events?limit=3&offset=0&order_by=start_date&order_dir=desc&status=APPROVED",
       { cache: "no-store" }
     )
       .then((r) => r.json())
@@ -54,11 +54,6 @@ export default function HomeLatestBlogs() {
       <div className="container">
         <div className="heading-title">
           Latest <span>Blogs</span>
-        </div>
-
-        <div className="headTxt">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et viverra
-          nulla. Fusce at rhoncus diam, quis convallis ligula.
         </div>
 
         <ul className="row blogGrid">
