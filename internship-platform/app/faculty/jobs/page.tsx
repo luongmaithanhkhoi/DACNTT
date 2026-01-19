@@ -341,7 +341,7 @@ export default function EnterpriseJobList() {
                             : "Chờ duyệt" // Công việc đang chờ duyệt
                       }
                     </span>
-                    <div className="mt-auto pt-4 flex justify-center">
+                    <div className="mt-auto pt-4 flex justify-evenly">
                       {job.status === "PENDING" && (
                         <button
                           onClick={() => handleApproveJob(job.id, job.title)}
@@ -462,15 +462,7 @@ export default function EnterpriseJobList() {
               Tất cả
             </button>
 
-            <button
-              onClick={() => setFilterStatus("PENDING")}
-              className={`px-5 py-2 rounded text-lg ${filterStatus === "PENDING"
-                  ? "bg-yellow-600 text-white"
-                  : "bg-white border border-gray-300 hover:bg-gray-100"
-                }`}
-            >
-              Chờ duyệt
-            </button>
+            
 
             <button
               onClick={() => setFilterStatus("APPROVED")}
@@ -491,7 +483,15 @@ export default function EnterpriseJobList() {
             >
               Đã đóng
             </button>
-
+            <button
+              onClick={() => setFilterStatus("PENDING")}
+              className={`px-5 py-2 rounded text-lg ${filterStatus === "PENDING"
+                  ? "bg-yellow-600 text-white"
+                  : "bg-white border border-gray-300 hover:bg-gray-100"
+                }`}
+            >
+              Chờ duyệt
+            </button>
             <button
               onClick={() => setFilterStatus("REJECTED")}
               className={`px-5 py-2 rounded text-lg ${filterStatus === "REJECTED"

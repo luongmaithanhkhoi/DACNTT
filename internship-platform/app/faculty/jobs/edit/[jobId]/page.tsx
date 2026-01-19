@@ -1,9 +1,9 @@
 import { notFound, redirect } from 'next/navigation';
 import PostJobForm from './PostJobForm'; // Form chung (sẽ tái sử dụng)
 
-async function fetchJobForEdit(id: string, jobId: string) {
+async function fetchJobForEdit(jobId: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/enterprises/${id}/jobs/${jobId}`, {
+  const res = await fetch(`${baseUrl}/api/admin/jobs/${jobId}`, {
     cache: 'no-store',
   });
 
@@ -26,7 +26,7 @@ export default async function EditJobPage({
   let error = null;
 
   try {
-    job = await fetchJobForEdit(id, jobId);
+    job = await fetchJobForEdit(jobId);
   } catch (err) {
     error = err instanceof Error ? err.message : 'Lỗi tải dữ liệu';
   }
@@ -50,7 +50,7 @@ export default async function EditJobPage({
               <div className="login p-8 bg-white rounded shadow-sm">
                 {error && <p className="text-red-600 text-center">{error}</p>}
                 {!error && job && (
-                  <PostJobForm initialData={job} enterpriseId={id} isEdit={true} jobId={jobId} />
+                  <PostJobForm initialData={job} enterpriseId={id} isEdit={true} jobId={jobId} isAdmin={true}/>
                 )}
               </div>
             </div>

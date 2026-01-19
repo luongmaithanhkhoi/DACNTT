@@ -11,6 +11,7 @@ interface PostJobFormProps {
   enterpriseId: string;
   isEdit?: boolean;
   jobId?: string;
+  isAdmin?: boolean;
 }
 
 export default function PostJobForm({
@@ -18,6 +19,7 @@ export default function PostJobForm({
   enterpriseId,
   isEdit = false,
   jobId = "",
+  isAdmin = false, 
 }: PostJobFormProps) {
   const {
     loading,
@@ -38,7 +40,7 @@ export default function PostJobForm({
     setLocationId,
     selectedSkills,
     handleSkillChange,
-  } = usePostJobLogic({ initialData, enterpriseId, isEdit, jobId });
+  } = usePostJobLogic({ initialData, enterpriseId, isEdit, jobId, isAdmin });
 
   // State cho RichTextEditor
   const [descriptionHtml, setDescriptionHtml] = useState<string>("");

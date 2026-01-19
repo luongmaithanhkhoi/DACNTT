@@ -42,6 +42,7 @@ interface UsePostJobLogicProps {
   enterpriseId: string;
   isEdit?: boolean;
   jobId?: string;
+  isAdmin?: boolean;
 }
 
 export function usePostJobLogic({
@@ -49,11 +50,15 @@ export function usePostJobLogic({
   enterpriseId,
   isEdit = false,
   jobId = "",
+  isAdmin = false, // ✅ thêm
 }: UsePostJobLogicProps) {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<JobCategory[]>([]);
@@ -62,9 +67,15 @@ export function usePostJobLogic({
 
   // Controlled state
   const [jobType, setJobType] = useState<string>(initialData?.job_type || "");
-  const [categoryId, setCategoryId] = useState<string>(initialData?.category_id || "");
-  const [workMode, setWorkMode] = useState<string>(initialData?.work_mode || "");
-  const [locationId, setLocationId] = useState<string>(initialData?.location_id || "");
+  const [categoryId, setCategoryId] = useState<string>(
+    initialData?.category_id || ""
+  );
+  const [workMode, setWorkMode] = useState<string>(
+    initialData?.work_mode || ""
+  );
+  const [locationId, setLocationId] = useState<string>(
+    initialData?.location_id || ""
+  );
 
   // State cho skills
   const [selectedSkills, setSelectedSkills] = useState<SelectedSkill[]>(
@@ -77,9 +88,9 @@ export function usePostJobLogic({
     const fetchData = async () => {
       try {
         const [locRes, catRes, skillRes] = await Promise.all([
-          fetch('/api/locations', { cache: 'no-store' }),
-          fetch('/api/job-categories', { cache: 'no-store' }),
-          fetch('/api/skills', { cache: 'no-store' }), 
+          fetch("/api/locations", { cache: "no-store" }),
+          fetch("/api/job-categories", { cache: "no-store" }),
+          fetch("/api/skills", { cache: "no-store" }),
         ]);
 
         const locJson = await locRes.json();
@@ -89,7 +100,7 @@ export function usePostJobLogic({
 
         setLocations(Array.isArray(locJson) ? locJson : []);
         setCategories(Array.isArray(catJson) ? catJson : []);
-       setSkills(Array.isArray(skillJson.data) ? skillJson.data : []);
+        setSkills(Array.isArray(skillJson.data) ? skillJson.data : []);
       } catch (err) {
         console.error("Lỗi tải dữ liệu form:", err);
         setMessage({ type: "error", text: "Không thể tải dữ liệu" });
@@ -102,13 +113,15 @@ export function usePostJobLogic({
   }, []);
 
   const handleSkillChange = (skillId: string, level: number) => {
-    setSelectedSkills(prev => {
-      const existing = prev.find(s => s.skill_id === skillId);
+    setSelectedSkills((prev) => {
+      const existing = prev.find((s) => s.skill_id === skillId);
       if (existing) {
         if (level === 0) {
-          return prev.filter(s => s.skill_id !== skillId); // Xóa nếu level = 0
+          return prev.filter((s) => s.skill_id !== skillId); // Xóa nếu level = 0
         }
-        return prev.map(s => s.skill_id === skillId ? { ...s, required_level: level } : s);
+        return prev.map((s) =>
+          s.skill_id === skillId ? { ...s, required_level: level } : s
+        );
       }
       if (level > 0) {
         return [...prev, { skill_id: skillId, required_level: level }];
@@ -135,30 +148,50 @@ export function usePostJobLogic({
       require_gpa_min: formData.get("require_gpa_min")
         ? parseFloat(formData.get("require_gpa_min") as string)
         : null,
-      application_deadline: formData.get("application_deadline")?.toString() || null,
+      application_deadline:
+        formData.get("application_deadline")?.toString() || null,
       skills: selectedSkills, // ← Gửi mảng skills
     };
 
-    if (!data.title || !data.category_id || !data.job_type || !data.location_id) {
-      setMessage({ type: "error", text: "Vui lòng điền đầy đủ các trường bắt buộc!" });
+    if (
+      !data.title ||
+      !data.category_id ||
+      !data.job_type ||
+      !data.location_id
+    ) {
+      setMessage({
+        type: "error",
+        text: "Vui lòng điền đầy đủ các trường bắt buộc!",
+      });
       setLoading(false);
       return;
     }
 
     try {
-      const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-      const currentEnterpriseId = typeof window !== 'undefined' 
-          ? localStorage.getItem('enterprise_id')
-          : null;
+      const baseUrl =
+        typeof window !== "undefined" ? window.location.origin : "";
+      // ✅ EnterpriseId dùng cho enterprise flow
+      const currentEnterpriseId = isAdmin
+        ? null
+        : typeof window !== "undefined"
+        ? localStorage.getItem("enterprise_id")
+        : null;
 
-        if (!currentEnterpriseId) {
-          setMessage({ type: "error", text: "Không tìm thấy doanh nghiệp. Vui lòng đăng nhập lại." });
-          setLoading(false);
-          return;
-}
+      // ✅ Nếu không phải admin mà không có enterprise_id => báo lỗi như cũ
+      if (!isAdmin && !currentEnterpriseId) {
+        setMessage({
+          type: "error",
+          text: "Không tìm thấy doanh nghiệp. Vui lòng đăng nhập lại.",
+        });
+        setLoading(false);
+        return;
+      }
+
       const url = isEdit
-        ? `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs/${jobId}`
-        : `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs`;
+        ? isAdmin
+          ? `${baseUrl}/api/admin/jobs/${jobId}` // ✅ admin update
+          : `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs/${jobId}` // enterprise update
+        : `${baseUrl}/api/enterprises/${currentEnterpriseId}/jobs`; // create vẫn enterprise
 
       const res = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
@@ -185,7 +218,11 @@ export function usePostJobLogic({
         }
 
         setTimeout(() => {
-          router.push(`/enterprises/${enterpriseId}/jobs`);
+          const target = isAdmin
+            ? `/admin/jobs` // đổi đúng route list job admin của bạn
+            : `/enterprises/${enterpriseId}/jobs`;
+        
+          router.push(target);
           router.refresh();
         }, 2000);
       } else {
@@ -219,4 +256,3 @@ export function usePostJobLogic({
     handleSkillChange,
   };
 }
-

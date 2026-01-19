@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -44,6 +42,7 @@ interface UsePostJobLogicProps {
   enterpriseId: string;
   isEdit?: boolean;
   jobId?: string;
+  isAdmin?: boolean;
 }
 
 export function usePostJobLogic({
@@ -51,11 +50,15 @@ export function usePostJobLogic({
   enterpriseId,
   isEdit = false,
   jobId = "",
+  isAdmin = false,
 }: UsePostJobLogicProps) {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const [locations, setLocations] = useState<Location[]>([]);
   const [categories, setCategories] = useState<JobCategory[]>([]);
@@ -64,9 +67,15 @@ export function usePostJobLogic({
 
   // Controlled state - khởi tạo từ initialData khi edit
   const [jobType, setJobType] = useState<string>(initialData?.job_type || "");
-  const [categoryId, setCategoryId] = useState<string>(initialData?.category_id || "");
-  const [workMode, setWorkMode] = useState<string>(initialData?.work_mode || "");
-  const [locationId, setLocationId] = useState<string>(initialData?.location_id || "");
+  const [categoryId, setCategoryId] = useState<string>(
+    initialData?.category_id || ""
+  );
+  const [workMode, setWorkMode] = useState<string>(
+    initialData?.work_mode || ""
+  );
+  const [locationId, setLocationId] = useState<string>(
+    initialData?.location_id || ""
+  );
 
   // Khởi tạo selectedSkills từ initialData.skills khi edit
   const [selectedSkills, setSelectedSkills] = useState<SelectedSkill[]>(
@@ -81,13 +90,13 @@ export function usePostJobLogic({
       setLoadingData(true);
       try {
         const [locRes, catRes, skillRes] = await Promise.all([
-          fetch('/api/locations', { cache: 'no-store' }),
-          fetch('/api/job-categories', { cache: 'no-store' }),
-          fetch('/api/skills', { cache: 'no-store' }),
+          fetch("/api/locations", { cache: "no-store" }),
+          fetch("/api/job-categories", { cache: "no-store" }),
+          fetch("/api/skills", { cache: "no-store" }),
         ]);
 
         if (!locRes.ok || !catRes.ok || !skillRes.ok) {
-          throw new Error('Không thể tải dữ liệu');
+          throw new Error("Không thể tải dữ liệu");
         }
 
         const locJson = await locRes.json();
@@ -121,9 +130,9 @@ export function usePostJobLogic({
 
   // Xử lý thay đổi kỹ năng
   const handleSkillChange = (skillId: string, level: number) => {
-    setSelectedSkills(prev => {
-      const existingIndex = prev.findIndex(s => s.skill_id === skillId);
-      
+    setSelectedSkills((prev) => {
+      const existingIndex = prev.findIndex((s) => s.skill_id === skillId);
+
       if (level === 0) {
         // Xóa nếu level = 0
         if (existingIndex !== -1) {
@@ -160,17 +169,27 @@ export function usePostJobLogic({
       job_type: jobType || null,
       work_mode: workMode || null,
       location_id: locationId || null,
-      internship_period: formData.get("internship_period")?.toString().trim() || null,
+      internship_period:
+        formData.get("internship_period")?.toString().trim() || null,
       require_gpa_min: formData.get("require_gpa_min")
         ? parseFloat(formData.get("require_gpa_min") as string)
         : null,
-      application_deadline: formData.get("application_deadline")?.toString() || null,
-      skills: selectedSkills.filter(s => s.required_level > 0), // Chỉ gửi level > 0
+      application_deadline:
+        formData.get("application_deadline")?.toString() || null,
+      skills: selectedSkills.filter((s) => s.required_level > 0), // Chỉ gửi level > 0
     };
 
     // Validate bắt buộc
-    if (!data.title || !data.category_id || !data.job_type || !data.location_id) {
-      setMessage({ type: "error", text: "Vui lòng điền đầy đủ các trường bắt buộc!" });
+    if (
+      !data.title ||
+      !data.category_id ||
+      !data.job_type ||
+      !data.location_id
+    ) {
+      setMessage({
+        type: "error",
+        text: "Vui lòng điền đầy đủ các trường bắt buộc!",
+      });
       setLoading(false);
       return;
     }
@@ -183,7 +202,9 @@ export function usePostJobLogic({
 
     try {
       const url = isEdit
-        ? `/api/enterprises/${enterpriseId}/jobs/${jobId}`
+        ? isAdmin
+          ? `/api/admin/jobs/${jobId}`
+          : `/api/enterprises/${enterpriseId}/jobs/${jobId}`
         : `/api/enterprises/${enterpriseId}/jobs`;
 
       const res = await fetch(url, {
@@ -197,7 +218,9 @@ export function usePostJobLogic({
       if (res.ok) {
         setMessage({
           type: "success",
-          text: isEdit ? "Cập nhật tin tuyển dụng thành công!" : "Đăng tin tuyển dụng thành công!",
+          text: isEdit
+            ? "Cập nhật tin tuyển dụng thành công!"
+            : "Đăng tin tuyển dụng thành công!",
         });
 
         // Chỉ reset form khi tạo mới
@@ -212,11 +235,18 @@ export function usePostJobLogic({
 
         // Redirect sau 2 giây
         setTimeout(() => {
-          router.push(`/enterprise/${enterpriseId}/jobs`);
+          const target = isAdmin
+            ? `/admin/jobs` // hoặc route list job admin của bạn
+            : `/enterprise/${enterpriseId}/jobs`;
+        
+          router.push(target);
           router.refresh();
         }, 2000);
       } else {
-        setMessage({ type: "error", text: result.error || "Lỗi khi lưu tin tuyển dụng" });
+        setMessage({
+          type: "error",
+          text: result.error || "Lỗi khi lưu tin tuyển dụng",
+        });
       }
     } catch (err) {
       console.error("Submit error:", err);
