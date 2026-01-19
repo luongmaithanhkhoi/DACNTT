@@ -43,7 +43,7 @@ export default function EventDetailClient({ ev }: { ev: EventDetail }) {
             {/* LEFT */}
             <div className="col-lg-8">
               <div className="blogWraper blogdetail">
-                <ul className="blogList">
+                <ul className="">
                   <li>
                     <div className="post-header margin-top30">
                       <h4>{ev.title}</h4>

@@ -29,7 +29,7 @@ export async function GET(
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // ✅ lấy event + category
+    // lấy event + category
    const { data: ev, error: evErr } = await sb
   .from("Event")
   .select(`
@@ -86,5 +86,128 @@ export async function GET(
       { error: e?.message ?? "Internal Server Error" },
       { status: 500 }
     );
+  }
+}
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+function getBearerToken(req: Request): string | null {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) return null;
+  const [scheme, token] = authHeader.split(' ');
+  return scheme?.toLowerCase() === 'bearer' ? token : null;
+}
+
+async function getUserRole(token: string): Promise<string | null> {
+  const authClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${token}` } } }
+  );
+
+  const { data: { user } } = await authClient.auth.getUser();
+  if (!user) return null;
+
+  const { data: appUser } = await supabaseAdmin
+    .from('User')
+    .select('role')
+    .eq('provider_uid', user.id)
+    .single();
+
+  return appUser?.role || null;
+}
+
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
+  try {
+    const params = await context.params;
+    const { id } = params;
+
+    if (!id) return NextResponse.json({ error: 'Thiếu ID sự kiện' }, { status: 400 });
+
+    const token = getBearerToken(req);
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const role = await getUserRole(token);
+    if (role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden: Chỉ admin mới được chỉnh sửa sự kiện' }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { action, ...updateFields } = body;
+
+    let updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    // Xử lý hành động đóng/mở
+    if (action === 'close') {
+      updateData.status = 'CLOSED';
+      updateData.closed_at = new Date().toISOString();
+    } else if (action === 'reopen') {
+      updateData.status = 'APPROVED';
+      updateData.closed_at = null;
+    } else {
+      // Cập nhật thông tin bình thường (edit event)
+      updateData = {
+        ...updateData,
+        title: updateFields.title,
+        description: updateFields.description,
+        start_date: updateFields.start_date || null,
+        end_date: updateFields.end_date || null,
+        event_type: updateFields.event_type || 'OTHER',
+        status: updateFields.status || 'PENDING',
+        positions_available: updateFields.positions_available ? parseInt(updateFields.positions_available) : null,
+        max_participants: updateFields.max_participants ? parseInt(updateFields.max_participants) : null,
+        location: updateFields.location || null,
+        required_skills: updateFields.required_skills || null,
+      };
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from('Event')
+      .update(updateData)
+      .eq('id', id);
+
+    if (updateError) {
+      console.error('Update event error:', updateError);
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+
+    // Nếu có tags mới → xử lý như trước (xóa cũ → thêm mới)
+    if (body.tags) {
+      await supabaseAdmin.from('EventTag').delete().eq('event_id', id);
+
+      for (const tagName of body.tags) {
+        let tagId;
+        const { data: existing } = await supabaseAdmin
+          .from('Tag')
+          .select('id')
+          .eq('name', tagName.trim())
+          .single();
+
+        if (existing) {
+          tagId = existing.id;
+        } else {
+          const { data: newTag } = await supabaseAdmin
+            .from('Tag')
+            .insert({ name: tagName.trim() })
+            .select('id')
+            .single();
+          tagId = newTag.id;
+        }
+
+        await supabaseAdmin
+          .from('EventTag')
+          .insert({ event_id: id, tag_id: tagId });
+      }
+    }
+
+    return NextResponse.json({ success: true, message: 'Cập nhật sự kiện thành công!' });
+  } catch (err: any) {
+    console.error('Event update error:', err);
+    return NextResponse.json({ error: err.message || 'Lỗi server' }, { status: 500 });
   }
 }

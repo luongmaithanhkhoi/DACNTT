@@ -110,6 +110,7 @@ export default function EnterpriseJobList() {
       return false;
     }
   };
+  
 
   const handleCloseEvent = async (eventId: string) => {
     if (!confirm("Bạn có chắc chắn muốn đóng sự kiện này?")) return;
@@ -370,7 +371,7 @@ export default function EnterpriseJobList() {
 
                     <div className="mt-auto pt-4 flex justify-center">
                       <Link
-                        href={`/enterprises/${enterpriseId}/jobs/${job.id}`}
+                        href={`/jobs/${job.id}`}
                         className="fs-5 px-4 py-2 text-lg rounded bg-blue text-black hover:bg-blue inline-block"
                       >
                         Xem
@@ -568,7 +569,7 @@ export default function EnterpriseJobList() {
                       </Link>
 
                       <Link
-                        href={`/enterprises/${enterpriseId}/events/edit/${event.id}`}
+                        href={`/faculty/event/edit/${event.id}`}
                         className="fs-5 px-4 py-2 text-lg rounded bg-yellow-500 text-black hover:bg-yellow-600"
                       >
                         Sửa
